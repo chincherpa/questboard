@@ -533,10 +533,12 @@ export default function SetupWizard({ onComplete, onCancel, initialConfig }) {
   function handlePlayerCount(n) {
     setPlayers(prev => {
       const existing = initialConfig?.players ?? prev;
-      return Array.from({ length: n }, (_, i) => {
-        if (i < existing.length) return { ...existing[i] };
-        return makeNewPlayer(existing.slice(0, i));
-      });
+      const result = [];
+      for (let i = 0; i < n; i++) {
+        if (i < existing.length) result.push({ ...existing[i], id: `player_${i}` });
+        else result.push(makeNewPlayer(result));
+      }
+      return result;
     });
     setPlayerIdx(0);
     setStep(2);

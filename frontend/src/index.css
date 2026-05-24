@@ -164,8 +164,9 @@ body {
 }
 
 .player-card.active {
-  border-color: var(--gold-border);
-  box-shadow: 0 0 16px rgba(200,149,42,0.2), inset 0 0 20px rgba(200,149,42,0.04);
+  border: 3px solid var(--gold2);
+  box-shadow: 0 0 20px rgba(232,184,75,0.45), 0 0 6px rgba(232,184,75,0.3), inset 0 0 24px rgba(200,149,42,0.07);
+  margin: -2px;
 }
 
 .player-card:not(.active):hover {
