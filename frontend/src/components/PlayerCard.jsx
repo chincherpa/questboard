@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { todayKey, dateSeededMonster, getLevelFromXP, critChanceForLevel, luckForLevel } from '../logic';
-
+import { todayKey, dateSeededMonster, getLevelFromXP, critChanceForLevel, luckForLevel, getPlayerTitle } from '../logic';
+import { BADGES } from '../data';
 import TileSprite from './TileSprite';
 import MonsterSprite from './MonsterSprite';
 
@@ -57,7 +57,7 @@ const MONSTER_CFG = {
   cyber_drone:      { src: '/sprites/monsters2/cyber_drone.png',     sw: 320, sh: 288, fs: 32, fr: 4 },
 };
 
-export default function PlayerCard({ player, gold, xp, isSelected, onClick, monsterDamage, monsterBaseline, lastHit, streak, monster }) {
+export default function PlayerCard({ player, gold, xp, isSelected, onClick, monsterDamage, monsterBaseline, lastHit, streak, monster, prestige, badges, onPrestige }) {
   const tKey = todayKey();
   const m = monster || dateSeededMonster(player, tKey);
   const totalDmg = (monsterDamage?.[player.id]?.[tKey]) || 0;
@@ -72,6 +72,10 @@ export default function PlayerCard({ player, gold, xp, isSelected, onClick, mons
   const mc = MONSTER_CFG[m.id] ?? MONSTER_CFG.green_slime;
   const { level, xpInLevel, xpNeeded } = getLevelFromXP(xp || 0);
   const critPct = Math.round(critChanceForLevel(level) * 100);
+  const luckPct = Math.round(luckForLevel(level) * 100);
+  const title = getPlayerTitle(badges || []);
+  const prestigeCount = prestige || 0;
+  const earnedBadges = (badges || []).map(id => BADGES.find(b => b.id === id)).filter(Boolean);
 
   // Hit flash state: triggered by lastHit changing
   const [hitting, setHitting] = useState(false);
@@ -96,7 +100,11 @@ export default function PlayerCard({ player, gold, xp, isSelected, onClick, mons
         <TileSprite tile={charCfg.tile} scale={4} />
       </div>
       <div className="player-info">
-        <div className="player-name">{player.name}</div>
+        <div className="player-name">
+          {player.name}
+          {prestigeCount > 0 && <span className="prestige-stars">{'⭐'.repeat(prestigeCount)}</span>}
+        </div>
+        {title && <div className="player-title">{title}</div>}
         <div className="player-class">{charCfg.label}</div>
         <div className="player-pts">
           <span className="gold-coin" />
@@ -116,6 +124,20 @@ export default function PlayerCard({ player, gold, xp, isSelected, onClick, mons
             <TileSprite tile={131} display={11} />
             {streak}d streak
           </div>
+        )}
+        {earnedBadges.length > 0 && (
+          <div className="badge-row">
+            {earnedBadges.slice(-5).map(b => (
+              <span key={b.id} className="badge-icon" title={`${b.name}: ${b.desc}`}>{b.icon}</span>
+            ))}
+          </div>
+        )}
+        {level >= 10 && onPrestige && (
+          <button
+            className="prestige-btn"
+            onClick={e => { e.stopPropagation(); onPrestige(player.id); }}
+            title="Prestige: reset XP for permanent gold bonus"
+          >⭐ PRESTIGE</button>
         )}
       </div>
       <div className={`monster-section${dead ? ' monster-dead' : ''}`}>

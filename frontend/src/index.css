@@ -793,3 +793,65 @@ body {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── Prestige & titles ── */
+.prestige-stars {
+  font-size: 9px;
+  margin-left: 4px;
+  letter-spacing: -1px;
+}
+
+.player-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: #c070f0;
+  margin-bottom: 2px;
+  letter-spacing: 0.02em;
+}
+
+.prestige-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  background: linear-gradient(135deg, #2a1a4a, #3a2a6a);
+  border: 1px solid #c070f0;
+  color: #c070f0;
+  padding: 3px 6px;
+  cursor: pointer;
+  margin-top: 4px;
+  letter-spacing: 0.03em;
+  animation: prestige-pulse 2s ease-in-out infinite;
+}
+
+@keyframes prestige-pulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(192,112,240,0.3); }
+  50%       { box-shadow: 0 0 10px rgba(192,112,240,0.7); }
+}
+
+/* ── Badge row ── */
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 3px;
+}
+
+.badge-icon {
+  font-size: 12px;
+  cursor: default;
+}
+
+/* ── Bonus chore ── */
+.chore.bonus {
+  border-color: rgba(232,184,75,0.5);
+  box-shadow: 0 0 8px rgba(232,184,75,0.2);
+}
+
+.bonus-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #f5c870;
+  background: rgba(200,149,42,0.2);
+  border: 1px solid rgba(200,149,42,0.4);
+  padding: 1px 4px;
+  border-radius: 2px;
+}

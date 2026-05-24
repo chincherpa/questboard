@@ -1,4 +1,4 @@
-import { MONSTERS, REWARDS } from './data';
+import { MONSTERS, REWARDS, LOOT_TABLE, TITLES } from './data';
 
 export function todayKey() {
   const d = new Date();
@@ -65,4 +65,45 @@ export function critChanceForLevel(level) {
 
 export function luckForLevel(level) {
   return Math.min(0.5, 0.05 + (level - 1) * 0.02);
+}
+
+export function streakMultiplier(streak) {
+  if (streak >= 14) return 2.0;
+  if (streak >= 7)  return 1.5;
+  if (streak >= 3)  return 1.2;
+  return 1.0;
+}
+
+export function dailyBonusChoreId(choreIds, dateKey) {
+  if (!choreIds.length) return null;
+  const hash = dateKey.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  return choreIds[hash % choreIds.length];
+}
+
+export function rollLoot() {
+  if (Math.random() > 0.10) return null;
+  return LOOT_TABLE[Math.floor(Math.random() * LOOT_TABLE.length)];
+}
+
+export function getPlayerTitle(playerBadgeIds) {
+  const set = new Set(playerBadgeIds || []);
+  for (const { badge, title } of TITLES) {
+    if (set.has(badge)) return title;
+  }
+  return null;
+}
+
+export function checkNewBadges(existingBadges, { streak, gold, monstersKilled, rewardsRedeemed, luckyCount, penaltyFreeDays }) {
+  const existing = new Set(existingBadges || []);
+  const earned = [];
+  if (!existing.has('first_blood')    && monstersKilled >= 1)   earned.push('first_blood');
+  if (!existing.has('streak_3')       && streak >= 3)           earned.push('streak_3');
+  if (!existing.has('streak_7')       && streak >= 7)           earned.push('streak_7');
+  if (!existing.has('streak_14')      && streak >= 14)          earned.push('streak_14');
+  if (!existing.has('big_spender')    && rewardsRedeemed >= 5)  earned.push('big_spender');
+  if (!existing.has('gold_hoarder')   && gold >= 100)           earned.push('gold_hoarder');
+  if (!existing.has('monster_slayer') && monstersKilled >= 10)  earned.push('monster_slayer');
+  if (!existing.has('lucky_charm')    && luckyCount >= 3)       earned.push('lucky_charm');
+  if (!existing.has('untouchable')    && penaltyFreeDays >= 7)  earned.push('untouchable');
+  return earned;
 }

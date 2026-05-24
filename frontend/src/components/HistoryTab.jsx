@@ -8,7 +8,7 @@ const TYPE_TILE = {
   reward:   41,
 };
 
-export default function HistoryTab({ history, players }) {
+export default function HistoryTab({ history, players, weeklyGold = {} }) {
   const [filter, setFilter] = useState(null);
 
   const all = [...history].reverse().slice(0, 200);
@@ -72,6 +72,25 @@ export default function HistoryTab({ history, players }) {
                 </span>
               </div>
             ))}
+          </div>
+        </>
+      )}
+
+      {players && players.length > 0 && (
+        <>
+          <div className="section-label" style={{ marginTop: 24 }}>Weekly leaderboard</div>
+          <div className="redeemed-list">
+            {[...players]
+              .sort((a, b) => (weeklyGold[b.id] || 0) - (weeklyGold[a.id] || 0))
+              .map((p, i) => (
+                <div key={p.id} className="redeemed-item">
+                  <span style={{ fontSize: 14, minWidth: 20 }}>{['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣'][i]}</span>
+                  <span>
+                    <span className="redeemed-name">{p.name}</span>{' '}
+                    <span style={{ color: '#f5c870' }}>{weeklyGold[p.id] || 0} gold</span> this week
+                  </span>
+                </div>
+              ))}
           </div>
         </>
       )}

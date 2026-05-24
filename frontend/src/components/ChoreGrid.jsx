@@ -6,7 +6,7 @@ function dmgClass(p) {
   return p === 1 ? 'pts-1' : p === 2 ? 'pts-2' : p === 3 ? 'pts-3' : 'pts-5';
 }
 
-function ChoreCard({ chore, players, dailyDone, weeklyDone, monthlyDone, selectedPlayerId, onClaim, onUnclaim }) {
+function ChoreCard({ chore, players, dailyDone, weeklyDone, monthlyDone, selectedPlayerId, onClaim, onUnclaim, bonusChoreId }) {
   const store = chore.freq === 'daily' ? dailyDone : chore.freq === 'weekly' ? weeklyDone : monthlyDone;
   const claimedById = store[chore.id];
   const isDone = !!claimedById;
@@ -23,12 +23,13 @@ function ChoreCard({ chore, players, dailyDone, weeklyDone, monthlyDone, selecte
 
   return (
     <div
-      className={`chore${isDone ? ' done' : ''}${canUndo ? ' undoable' : ''}`}
+      className={`chore${isDone ? ' done' : ''}${canUndo ? ' undoable' : ''}${chore.id === bonusChoreId ? ' bonus' : ''}`}
       onClick={handleClick}
       title={canUndo ? 'Tap to undo' : undefined}
     >
       <div className="chore-top">
         <TileSprite tile={chore.icon} scale={2} />
+        {chore.id === bonusChoreId && <span className="bonus-badge">⭐2x</span>}
         <span className={`pts-badge ${dmgClass(chore.pts)}`}>
           <TileSprite tile={118} display={10} />
           {chore.pts}
@@ -42,7 +43,7 @@ function ChoreCard({ chore, players, dailyDone, weeklyDone, monthlyDone, selecte
   );
 }
 
-export default function ChoreGrid({ player, players, activeChores, dailyDone, weeklyDone, monthlyDone, onClaimChore, onUnclaimChore }) {
+export default function ChoreGrid({ player, players, activeChores, dailyDone, weeklyDone, monthlyDone, onClaimChore, onUnclaimChore, bonusChoreId }) {
   const chores = getChoresFor(player, activeChores);
   const daily   = chores.filter(c => c.freq === 'daily');
   const weekly  = chores.filter(c => c.freq === 'weekly');
@@ -56,6 +57,7 @@ export default function ChoreGrid({ player, players, activeChores, dailyDone, we
     monthlyDone: monthlyDone || {},
     onClaim: onClaimChore,
     onUnclaim: onUnclaimChore,
+    bonusChoreId,
   };
 
   return (
