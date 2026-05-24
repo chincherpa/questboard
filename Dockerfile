@@ -1,4 +1,4 @@
-# ── Stage 1: Build React frontend ──────────────────────────────────────
+# Stage 1: Build React frontend
 FROM node:20-alpine AS frontend-builder
 WORKDIR /build
 COPY frontend/package.json frontend/package-lock.json ./
@@ -7,7 +7,7 @@ COPY frontend/ .
 # VITE_API_URL left unset — defaults to /api (proxied by nginx inside container)
 RUN npm run build
 
-# ── Stage 2: Runtime (nginx + Python) ──────────────────────────────────
+# Stage 2: Runtime (nginx + Python)
 FROM python:3.11-slim
 
 RUN apt-get update \
