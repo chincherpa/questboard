@@ -1,13 +1,13 @@
-# Choreboard
+# Questboard
 
 > Turn household chores into a pixel art RPG adventure.
 
 Each family member gets a hero and faces a daily monster. Complete chores to deal damage — defeat the monster before midnight to earn gold, or it fights back. Spend gold in the reward shop on treats you've agreed on as a family.
 
-![Choreboard](https://raw.githubusercontent.com/thillygooth/choreboard/main/screenshot.png)
+![Questboard](https://raw.githubusercontent.com/thillygooth/questboard/main/screenshot.png)
 
-[![Release](https://img.shields.io/github/v/release/thillygooth/choreboard)](https://github.com/thillygooth/choreboard/releases)
-[![License](https://img.shields.io/github/license/thillygooth/choreboard)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/thillygooth/questboard)](https://github.com/thillygooth/questboard/releases)
+[![License](https://img.shields.io/github/license/thillygooth/questboard)](LICENSE)
 
 ---
 
@@ -17,12 +17,12 @@ Each family member gets a hero and faces a daily monster. Complete chores to dea
 2. Click **⋮** (top right) → **Repositories**
 3. Paste and add:
    ```
-   https://github.com/thillygooth/choreboard
+   https://github.com/thillygooth/questboard
    ```
-4. Find **Choreboard** in the store → **Install**
+4. Find **Questboard** in the store → **Install**
 5. Click **Start** then **Open Web UI**
 
-Choreboard appears in your HA sidebar. No port forwarding required.
+Questboard appears in your HA sidebar. No port forwarding required.
 
 ---
 
@@ -41,10 +41,10 @@ Choreboard appears in your HA sidebar. No port forwarding required.
 ## Manual Install (Docker)
 
 ```bash
-git clone https://github.com/thillygooth/choreboard
-cd choreboard
-docker build -t choreboard .
-docker run -d -p 8099:8099 -v ./data:/data choreboard
+git clone https://github.com/thillygooth/questboard
+cd questboard
+docker build -t questboard .
+docker run -d -p 8099:8099 -v ./data:/data questboard
 ```
 
 Open `http://localhost:8099`.
