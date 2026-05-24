@@ -15,7 +15,7 @@ const CLASS_TILES = {
 
 // src, sheetW, sheetH, frameSize (default 64), frames, CSS filter, offsetY px, display override dp
 const MONSTER_CFG = {
-  // ── PixelFlush Mega Pack — horizontal frame strips ───────────────────
+  // PixelFlush Mega Pack - horizontal frame strips
   green_slime:      { src: '/sprites/monsters2/green_slime.png',     sw:  32, sh:  32, fs: 32, fr: 1 },
   rat:              { src: '/sprites/monsters2/rat.png',             sw:  64, sh:  32, fs: 32, fr: 2 },
   tiny_spider:      { src: '/sprites/monsters2/tiny_spider.png',     sw:  64, sh:  32, fs: 32, fr: 2 },
@@ -43,16 +43,16 @@ const MONSTER_CFG = {
   sandworm:         { src: '/sprites/monsters2/sandworm.png',        sw: 128, sh:  32, fs: 32, fr: 4 },
   volcano_drake:    { src: '/sprites/monsters2/volcano_drake.png',   sw: 256, sh:  64, fs: 64, fr: 4, dp: 64 },
   happy_blob:       { src: '/sprites/monsters2/happy_blob.png',      sw: 256, sh:  64, fs: 64, fr: 4, dp: 56 },
-  // ── JRPG Pack — single-frame sprites ────────────────────────────────
+  // JRPG Pack - single-frame sprites
   evil_shroom:      { src: '/sprites/monsters2/evil_shroom.png',     sw:  32, sh:  32, fs: 32, fr: 1 },
   void_devil:       { src: '/sprites/monsters2/void_devil.png',      sw:  32, sh:  32, fs: 32, fr: 1 },
   wild_buck:        { src: '/sprites/monsters2/wild_buck.png',       sw:  48, sh:  48, fs: 48, fr: 1 },
   mimic:            { src: '/sprites/monsters2/mimic.png',           sw:  48, sh:  48, fs: 48, fr: 1 },
   rock_golem:       { src: '/sprites/monsters2/rock_golem.png',      sw:  48, sh:  48, fs: 48, fr: 1, dp: 54 },
   jrpg_ogre:        { src: '/sprites/monsters2/jrpg_ogre.png',       sw:  48, sh:  48, fs: 48, fr: 1, dp: 56 },
-  // ── Dark Fantasy Enemies — Bat (animated 9-frame idle strip) ────────
+  // Dark Fantasy Enemies - Bat (animated 9-frame idle strip)
   cave_bat:         { src: '/sprites/monsters2/cave_bat.png',        sw: 576, sh:  64, fs: 64, fr: 9 },
-  // ── Scifi Pack — walk loops start at frame 0 ────────────────────────
+  // Scifi Pack - walk loops start at frame 0
   cyber_walker:     { src: '/sprites/monsters2/cyber_walker.png',    sw: 400, sh: 160, fs: 40, fr: 4 },
   cyber_drone:      { src: '/sprites/monsters2/cyber_drone.png',     sw: 320, sh: 288, fs: 32, fr: 4 },
 };

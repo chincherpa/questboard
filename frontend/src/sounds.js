@@ -1,4 +1,4 @@
-// Lazy singleton AudioContext — created on first use to satisfy browser autoplay policy.
+// Lazy singleton AudioContext, created on first use to satisfy browser autoplay policy.
 let ctx = null;
 
 function getCtx() {
@@ -53,7 +53,7 @@ export function playRedeem() {
   [523, 659, 784].forEach((f, i) => setTimeout(() => beep(f, 0.13), i * 65));
 }
 
-// Sharp 5-note ascending arpeggio played on a critical hit — higher and brighter than kill fanfare.
+// Sharp 5-note ascending arpeggio on a critical hit, higher and brighter than the kill fanfare.
 export function playCrit() {
   [494, 659, 880, 1175, 1568].forEach((f, i) =>
     setTimeout(() => beep(f, i === 4 ? 0.3 : 0.1, 'square', 0.15), i * 50)

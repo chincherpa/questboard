@@ -11,7 +11,7 @@ arch:
   - armv7
 
 # Pre-built image from GitHub Container Registry
-# Tag matches the version field above — updated here before tagging a release
+# Tag matches the version field above; update here before tagging a release
 image: "ghcr.io/thillygooth/questboard:{version}"
 
 # HA Ingress: app is accessible via HA sidebar with no port forwarding needed

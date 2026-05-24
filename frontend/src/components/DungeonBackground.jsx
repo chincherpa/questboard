@@ -18,7 +18,7 @@ function tilePos(idx) {
   };
 }
 
-// Deterministic per-cell random — no flicker on re-render
+// Deterministic per-cell random, stable across re-renders
 function seeded(tx, ty) {
   let n = tx * 1619 + ty * 31337;
   n = ((n >> 16) ^ n) * 0x45d9f3b;
@@ -64,7 +64,7 @@ export default function DungeonBackground() {
         }
       }
 
-      // Vignette — darker at edges, open in the centre
+      // Vignette: darker at edges, open in the centre
       ctx.globalAlpha = 1;
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
