@@ -31,7 +31,13 @@ Questboard appears in your HA sidebar. No port forwarding required.
 - **Monster battles** — each player fights a unique monster every day
 - **Crit hits** — 5% base chance to double damage, increases as you level up
 - **XP & levels** — defeat monsters to gain XP and raise your crit chance
+- **Kill streaks** — multi-day streaks multiply gold rewards (up to 2x)
+- **Combo attacks** — chain chores quickly for bonus damage
+- **Loot drops** — chance to find bonus gold or XP after completing a chore
+- **Badges & titles** — unlock achievements and earn a hero title
+- **Prestige** — reset XP at level 10 for a permanent gold bonus
 - **Gold economy** — earn gold by winning, spend it in the family reward shop
+- **Weekly leaderboard** — see who earned the most gold this week
 - **Smart resets** — daily/weekly/monthly chores reset automatically at the right time
 - **Overnight penalty** — fail to defeat your monster and lose gold when you sleep
 - **Up to 6 players** — each with their own monster, gold, XP, and streak
@@ -50,7 +56,12 @@ docker run -d -p 8099:8099 -v /opt/questboard/data:/data questboard
 
 Open `http://localhost:8099`.
 
-> **Note:** Use an absolute path for the data volume (`/opt/questboard/data` above). Relative paths like `./data` can fail if the working directory isn't writable. Choose any writable absolute path you prefer.
+**Running on Home Assistant OS?** The `/root` filesystem is read-only, so `./data` will fail. Use the writable supervisor data path instead:
+
+```bash
+mkdir -p /mnt/data/supervisor/questboard/data
+docker run -d -p 8099:8099 -v /mnt/data/supervisor/questboard/data:/data questboard
+```
 
 ---
 
