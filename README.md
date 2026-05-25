@@ -77,6 +77,25 @@ Open `http://localhost:8099`.
 
 ---
 
+## Running on a Separate Host
+
+Questboard has no connection to Home Assistant — it's a standalone web app that stores its own data. You can run it on any machine on your network, not just the HA host.
+
+To add it to the HA sidebar from a separate Docker host, just point the `url` at that machine's IP:
+
+```yaml
+panel_iframe:
+  questboard:
+    title: "Questboard"
+    url: "http://<docker-host-ip>:8099"
+    icon: mdi:sword-cross
+    require_admin: false
+```
+
+Replace `<docker-host-ip>` with the IP of whichever machine is running the container (e.g. `192.168.1.50`). The sidebar embeds any reachable URL — it doesn't need to be on the HA host.
+
+---
+
 ## First-Run Setup
 
 A setup wizard runs the first time you open the app:
