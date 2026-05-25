@@ -679,6 +679,7 @@ export default function App() {
 
       <div className={`toast${toast.visible ? ' show' : ''}`}>{toast.msg}</div>
     </div>
+    <div className="version-label">v{__APP_VERSION__}</div>
     {celebration && <Celebration onDismiss={() => setCelebration(false)} />}
     </>
   );
