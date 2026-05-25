@@ -13,16 +13,33 @@ Each family member gets a hero and faces a daily monster. Complete chores to dea
 
 ## Install on Home Assistant
 
-1. Go to **Settings → Add-ons → Add-on Store**
-2. Click **⋮** (top right) → **Repositories**
-3. Paste and add:
-   ```
-   https://github.com/thillygooth/questboard
-   ```
-4. Find **Questboard** in the store → **Install**
-5. Click **Start** then **Open Web UI**
+**Step 1 — Run the container**
 
-Questboard appears in your HA sidebar. No port forwarding required.
+In the HA Terminal add-on:
+
+```bash
+mkdir -p /mnt/data/supervisor/questboard/data
+docker run -d --restart unless-stopped -p 8099:8099 \
+  -v /mnt/data/supervisor/questboard/data:/data \
+  ghcr.io/thillygooth/questboard:latest
+```
+
+**Step 2 — Add to the HA sidebar**
+
+In `configuration.yaml` (use the File Editor add-on):
+
+```yaml
+panel_iframe:
+  questboard:
+    title: "Questboard"
+    url: "http://<your-ha-ip>:8099"
+    icon: mdi:sword-cross
+    require_admin: false
+```
+
+Replace `<your-ha-ip>` with your Home Assistant IP (e.g. `192.168.1.34`). Find it under **Settings → System → Network**.
+
+Then restart HA (**Settings → System → Restart**). Questboard appears in your sidebar.
 
 ---
 
@@ -47,26 +64,15 @@ Questboard appears in your HA sidebar. No port forwarding required.
 ## Manual Install (Docker)
 
 ```bash
-git clone https://github.com/thillygooth/questboard
-cd questboard
-docker build -t questboard .
-```
-
-**On Home Assistant OS** (most of the filesystem is read-only — use the supervisor data partition):
-
-```bash
-mkdir -p /mnt/data/supervisor/questboard/data
-docker run -d -p 8099:8099 -v /mnt/data/supervisor/questboard/data:/data questboard
-```
-
-**On regular Linux** (any writable path works):
-
-```bash
 mkdir -p /opt/questboard/data
-docker run -d -p 8099:8099 -v /opt/questboard/data:/data questboard
+docker run -d --restart unless-stopped -p 8099:8099 \
+  -v /opt/questboard/data:/data \
+  ghcr.io/thillygooth/questboard:latest
 ```
 
 Open `http://localhost:8099`.
+
+> Use any writable absolute path for the data volume. On Home Assistant OS use `/mnt/data/supervisor/questboard/data` instead of `/opt/questboard/data` since most of the filesystem is read-only.
 
 ---
 
