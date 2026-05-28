@@ -614,6 +614,7 @@ function StepRewardSelect({ players, enabledRewards, onToggle, rewardOverrides, 
 }
 
 // ── Edit tab: Party ───────────────────────────────────────────────────────────
+function TabParty({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer }) {
   const [expandedIdx, setExpandedIdx] = useState(null);
 
   return (
