@@ -775,7 +775,7 @@ export default function App() {
     <>
     <DungeonBackground />
     <Torches />
-    <div className="board" style={{ position: 'relative', zIndex: 1 }}>
+    <div className="board" style={{ position: 'relative', zIndex: 2 }}>
       <div className="header">
         <span className="title"><TileSprite tile={118} display={18} /> Questboard</span>
         <div className="tabs">
