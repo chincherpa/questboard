@@ -4,10 +4,33 @@ Date: 2026-06-15
 
 ## Goal
 
-Switching to a non-active player must require a 4-digit PIN. Each player sets
-their own PIN; the default is `0000`. Clicking an inactive hero opens a modal
-that asks for the PIN. Correct PIN switches to that player. Wrong PIN shows a
-message and lets the user try again.
+Becoming the **active** player (the one allowed to act) must require a 4-digit
+PIN. Each player sets their own PIN; the default is `0000`.
+
+Selecting a hero stays exactly as it is today: clicking a card selects it and
+shows that hero's board. NEW: when the selected hero is not the active player, a
+**"Switch"** button appears in that hero's box. Clicking it opens a PIN prompt.
+Correct PIN makes that hero the active player; wrong PIN shows a message and
+lets the user try again.
+
+## Active vs. selected
+
+Two distinct states:
+
+- **`selected`** (existing): the card the user clicked. Its board is displayed.
+  Clicking toggles selection. **No PIN.** Unchanged from today.
+- **`active`** (new): the player permitted to perform actions — claim chores,
+  redeem rewards, use power-ups, prestige, dungeon moves. Runtime state in
+  `App.jsx`, default `null`, held in memory only (resets on page reload; a
+  reload requires re-entering a PIN to act, which is acceptable for a kiosk).
+
+A selected hero who is **not** active is **view-only**: their board renders, but
+all action controls are disabled. You can only act when `selected === active`.
+Because the switch sets `active` to the currently-selected hero, after a
+successful switch `selected === active` and the board becomes interactive.
+
+Switching only gates *changing* who is active. Re-selecting the already-active
+hero (e.g. after viewing someone else) needs no PIN.
 
 ## Data model
 
@@ -40,18 +63,23 @@ PIN input on these setup screens: a single text input, numeric only, max length
 the switch modal. Input is sanitized to digits only. On save, if
 the field is not exactly 4 digits it falls back to `0000`.
 
-## Switch modal (`PinModal.jsx`)
+## Switch button + PIN modal
+
+### Switch button (`PlayerCard.jsx`)
+
+`PlayerCard` gains two props: `isActive` and `onSwitch`. When
+`isSelected && !isActive`, render a **"Switch"** button inside the player box.
+Clicking it calls `onSwitch(player.id)` (stop propagation so it doesn't also
+toggle selection). The button is the only entry point to the PIN prompt.
+
+`selectPlayer(id)` is **unchanged**: it toggles `selected` with no PIN.
+
+### PIN modal (`PinModal.jsx`)
 
 New component `frontend/src/components/PinModal.jsx`.
 
 App-level state in `App.jsx`: `pinTarget` — the id of the player awaiting PIN
-entry (`null` when the modal is closed).
-
-`selectPlayer(id)` behavior changes:
-
-- If `id === selected` → deselect the current player (no PIN required).
-- Otherwise → `setPinTarget(id)` to open the modal. The switch does **not**
-  happen yet.
+entry (`null` when the modal is closed). `onSwitch` sets `pinTarget`.
 
 Modal contents and behavior:
 
@@ -60,10 +88,23 @@ Modal contents and behavior:
 - When the 4th digit is entered, auto-submit (verify immediately). A submit
   button is also acceptable as a fallback.
 - Compare entered value against `targetPlayer.pin ?? "0000"`.
-  - **Match** → `setSelected(pinTarget)`, then close modal (`setPinTarget(null)`).
+  - **Match** → `setActive(pinTarget)`, then close modal (`setPinTarget(null)`).
+    Since `pinTarget` is the selected card, `selected === active` afterward and
+    the board becomes interactive.
   - **Mismatch** → show error message ("Falscher PIN"), clear all boxes,
     refocus the first box, allow retry.
 - Cancel via a close button or backdrop click → close modal, no switch.
+
+## Read-only gating
+
+When `selected !== active`, the selected hero's board is view-only:
+
+- Pass a `readOnly` (or `canAct`) prop to `ChoreGrid`, `RewardGrid`, and the
+  dungeon view so claim / redeem / move / power-up / prestige controls are
+  disabled or hidden.
+- Action handlers in `App.jsx` (`claimChore`, `unclaimChore`, `redeemReward`,
+  power-up activation, `handlePrestige`, dungeon moves) early-return unless
+  `selected === active`, as a defense in case a disabled control is bypassed.
 
 ## Error handling
 
@@ -86,5 +127,7 @@ Modal contents and behavior:
 |------|--------|
 | `frontend/src/components/SetupWizard.jsx` | PIN input in `PlayerForm` and `TabParty`; `pin: '0000'` in `makeNewPlayer` |
 | `frontend/src/components/PinModal.jsx` | New modal component (4 boxes, verify, retry) |
-| `frontend/src/App.jsx` | `pinTarget` state; `selectPlayer` opens modal; render `PinModal` |
-| `frontend/src/index.css` | Modal + PIN-box styles |
+| `frontend/src/components/PlayerCard.jsx` | `isActive` + `onSwitch` props; render "Switch" button when selected and not active |
+| `frontend/src/App.jsx` | `active` + `pinTarget` state; `onSwitch` opens modal; render `PinModal`; gate action handlers on `selected === active`; pass `readOnly`/`isActive` to children |
+| `frontend/src/components/ChoreGrid.jsx`, `RewardGrid`, dungeon view | Accept `readOnly` to disable action controls |
+| `frontend/src/index.css` | Modal, PIN-box, and Switch-button styles |
