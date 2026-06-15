@@ -30,7 +30,7 @@ function ChoreCard({ chore, players, dailyDone, weeklyDone, monthlyDone, selecte
     <div
       className={`chore ${chore.freq}${isDone ? ' done' : ''}${canUndo ? ' undoable' : ''}${chore.id === bonusChoreId ? ' bonus' : ''}`}
       onClick={handleClick}
-      title={canUndo ? 'Tap to undo' : undefined}
+      title={canUndo ? 'Zum Rückgängigmachen tippen' : undefined}
     >
       <div className="chore-top">
         <TileSprite tile={chore.icon} scale={2} />
@@ -42,7 +42,7 @@ function ChoreCard({ chore, players, dailyDone, weeklyDone, monthlyDone, selecte
       </div>
       <div className="chore-name">{chore.name}{chore.mode === 'solo' && <span className="solo-badge">1P</span>}</div>
       {isDone && (
-        <div className="done-by">{canUndo ? '↩ undo' : `✔ ${dp ? dp.name : 'done'}`}</div>
+        <div className="done-by">{canUndo ? '↩ zurück' : `✔ ${dp ? dp.name : 'erledigt'}`}</div>
       )}
     </div>
   );
@@ -50,9 +50,10 @@ function ChoreCard({ chore, players, dailyDone, weeklyDone, monthlyDone, selecte
 
 export default function ChoreGrid({ player, players, activeChores, dailyDone, weeklyDone, monthlyDone, onClaimChore, onUnclaimChore, bonusChoreId }) {
   const chores = getChoresFor(player, activeChores);
-  const daily   = chores.filter(c => c.freq === 'daily');
-  const weekly  = chores.filter(c => c.freq === 'weekly');
-  const monthly = chores.filter(c => c.freq === 'monthly');
+  const byName  = (a, b) => a.name.localeCompare(b.name);
+  const daily   = chores.filter(c => c.freq === 'daily').sort(byName);
+  const weekly  = chores.filter(c => c.freq === 'weekly').sort(byName);
+  const monthly = chores.filter(c => c.freq === 'monthly').sort(byName);
 
   const cardProps = {
     players,
@@ -70,8 +71,8 @@ export default function ChoreGrid({ player, players, activeChores, dailyDone, we
       <div>
         <div className="section-label">
           <TileSprite tile={118} display={12} />
-          Daily Quests
-          <span className="reset-info">— resets at midnight</span>
+          Tägliche Quests
+          <span className="reset-info">— Reset um Mitternacht</span>
         </div>
         <div className="chores">
           {daily.map(c => <ChoreCard key={c.id} chore={c} {...cardProps} />)}
@@ -81,8 +82,8 @@ export default function ChoreGrid({ player, players, activeChores, dailyDone, we
         <div>
           <div className="section-label">
             <TileSprite tile={131} display={12} />
-            Weekly Quests
-            <span className="reset-info">— resets Sunday</span>
+            Wöchentliche Quests
+            <span className="reset-info">— Reset am Sonntag</span>
           </div>
           <div className="chores">
             {weekly.map(c => <ChoreCard key={c.id} chore={c} {...cardProps} />)}
@@ -90,11 +91,11 @@ export default function ChoreGrid({ player, players, activeChores, dailyDone, we
         </div>
       )}
       {monthly.length > 0 && (
-        <div>
+        <div className="monthly-section">
           <div className="section-label">
             <TileSprite tile={72} display={12} />
-            Monthly Quests
-            <span className="reset-info">— resets 1st of month</span>
+            Monatliche Quests
+            <span className="reset-info">— Reset am 1. des Monats</span>
           </div>
           <div className="chores">
             {monthly.map(c => <ChoreCard key={c.id} chore={c} {...cardProps} />)}

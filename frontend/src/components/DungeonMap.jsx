@@ -229,17 +229,17 @@ function FloorCell({ size, tileType, vis, isPlayer, isExplored, hasKey, othersHe
 function currentTileDesc(tileType, dungeonMap) {
   const am = dungeonMap.activeMonster;
   switch (tileType) {
-    case 'floor':        return 'Stone floor';
-    case 'start':        return 'Starting chamber';
-    case 'gold_s':       return 'Scattered coins — collected';
-    case 'gold_l':       return 'Treasure pile — looted';
-    case 'chest':        return 'Chest — emptied';
-    case 'trap':         return 'Trap — triggered!';
-    case 'monster':      return am ? `⚔ ${am.name} blocks the way!` : 'Monster lair — cleared';
-    case 'key':          return 'Key location — found!';
-    case 'locked_chest': return dungeonMap.lockedChestOpened ? 'Bonus chest — opened' : (dungeonMap.hasKey ? 'Locked chest (key ready!)' : 'Locked chest (need key)');
-    case 'stairs_down':  return 'Stairs leading deeper';
-    case 'stairs_up':    return 'Stairs leading up';
+    case 'floor':        return 'Steinboden';
+    case 'start':        return 'Startkammer';
+    case 'gold_s':       return 'Verstreute Münzen — eingesammelt';
+    case 'gold_l':       return 'Schatzhaufen — geplündert';
+    case 'chest':        return 'Truhe — geleert';
+    case 'trap':         return 'Falle — ausgelöst!';
+    case 'monster':      return am ? `⚔ ${am.name} versperrt den Weg!` : 'Monsterhöhle — gesäubert';
+    case 'key':          return 'Schlüssel-Ort — gefunden!';
+    case 'locked_chest': return dungeonMap.lockedChestOpened ? 'Bonustruhe — geöffnet' : (dungeonMap.hasKey ? 'Verschlossene Truhe (Schlüssel bereit!)' : 'Verschlossene Truhe (Schlüssel nötig)');
+    case 'stairs_down':  return 'Treppe nach unten';
+    case 'stairs_up':    return 'Treppe nach oben';
     default:             return '';
   }
 }
@@ -271,7 +271,7 @@ export default function DungeonMap({ player, dungeonMap, allPlayers = [], allDun
     <div className="dmap-tab-layout">
       {/* ── Left sidebar ── */}
       <div className="dmap-sidebar">
-        <div className="dmap-sidebar-title">LEGEND</div>
+        <div className="dmap-sidebar-title">LEGENDE</div>
         <div className="dmap-legend">
           {/* "You" row — shows the actual class sprite with the same glow as on the map */}
           <div className="dmap-legend-row">
@@ -291,14 +291,14 @@ export default function DungeonMap({ player, dungeonMap, allPlayers = [], allDun
                 }} />
               );
             })()}
-            <span className="dmap-legend-label">You</span>
+            <span className="dmap-legend-label">Du</span>
           </div>
           {[
-            { icon: '◇', color: '#ffd700', label: 'Key'          },
-            { icon: '▣', color: '#778899', label: 'Locked chest' },
-            { icon: '▼', color: '#b88cff', label: 'Stairs down'  },
-            { icon: '▲', color: '#88c8ff', label: 'Stairs up'    },
-            { icon: '?', color: '#666',    label: 'Danger'       },
+            { icon: '◇', color: '#ffd700', label: 'Schlüssel'    },
+            { icon: '▣', color: '#778899', label: 'Verschl. Truhe' },
+            { icon: '▼', color: '#b88cff', label: 'Treppe runter' },
+            { icon: '▲', color: '#88c8ff', label: 'Treppe hoch'  },
+            { icon: '?', color: '#666',    label: 'Gefahr'       },
             { icon: '★', color: '#50c870', label: 'Start'        },
           ].map(({ icon, color, label }) => (
             <div key={label} className="dmap-legend-row">
@@ -311,28 +311,28 @@ export default function DungeonMap({ player, dungeonMap, allPlayers = [], allDun
         <div className="dmap-sidebar-title" style={{ marginTop: 14 }}>STATUS</div>
         <div className="dmap-status">
           <div className="dmap-status-row">
-            <span className="dmap-status-label">Floor:</span>
+            <span className="dmap-status-label">Ebene:</span>
             <span className="dmap-status-val" style={{ color: '#b88cff' }}>{floor}</span>
           </div>
           <div className="dmap-status-row">
-            <span className="dmap-status-label">Key:</span>
+            <span className="dmap-status-label">Schlüssel:</span>
             <span className="dmap-status-val" style={{ color: dungeonMap.hasKey ? '#ffd700' : '#444' }}>
-              {dungeonMap.hasKey ? '◇ held' : dungeonMap.lockedChestOpened ? '✓ used' : 'not found'}
+              {dungeonMap.hasKey ? '◇ dabei' : dungeonMap.lockedChestOpened ? '✓ benutzt' : 'nicht gefunden'}
             </span>
           </div>
           <div className="dmap-status-row">
-            <span className="dmap-status-label">Moves:</span>
+            <span className="dmap-status-label">Züge:</span>
             <span className="dmap-status-val" style={{ color: pendingMoves > 0 ? '#80c8ff' : '#555' }}>{pendingMoves}</span>
           </div>
           <div className="dmap-status-row">
-            <span className="dmap-status-label">Explored:</span>
-            <span className="dmap-status-val">{explored.length} tiles</span>
+            <span className="dmap-status-label">Erkundet:</span>
+            <span className="dmap-status-val">{explored.length} Felder</span>
           </div>
           {(() => {
             const desc = currentTileDesc(getTileAt(grid, px, py), dungeonMap);
             return desc ? (
               <div className="dmap-status-row" style={{ marginTop: 4, flexWrap: 'wrap' }}>
-                <span className="dmap-status-label">Tile:</span>
+                <span className="dmap-status-label">Feld:</span>
                 <span className="dmap-status-val" style={{ fontSize: 8, color: inCombat ? '#ff7060' : undefined }}>{desc}</span>
               </div>
             ) : null;
@@ -342,7 +342,7 @@ export default function DungeonMap({ player, dungeonMap, allPlayers = [], allDun
         {/* Party positions */}
         {allPlayers.filter(p => p.id !== player.id && allDungeonMaps[p.id]).length > 0 && (
           <>
-            <div className="dmap-sidebar-title" style={{ marginTop: 14 }}>PARTY</div>
+            <div className="dmap-sidebar-title" style={{ marginTop: 14 }}>GRUPPE</div>
             <div className="dmap-status">
               {allPlayers.map((p, idx) => {
                 if (p.id === player.id) return null;
@@ -366,7 +366,7 @@ export default function DungeonMap({ player, dungeonMap, allPlayers = [], allDun
                     }} />
                     <span className="dmap-status-label" style={{ marginLeft: 4 }}>{p.name}</span>
                     <span className="dmap-status-val" style={{ color: dist === 0 ? color : undefined }}>
-                      {dist === 0 ? 'here!' : `f${dm.floor || 1}`}
+                      {dist === 0 ? 'hier!' : `E${dm.floor || 1}`}
                     </span>
                   </div>
                 );
@@ -384,21 +384,21 @@ export default function DungeonMap({ player, dungeonMap, allPlayers = [], allDun
               <div className="dmap-monster-hp-fill" style={{ width: `${Math.round((activeMonster.currentHP / activeMonster.maxHP) * 100)}%` }} />
             </div>
             <div className="dmap-warning-sub">HP: {activeMonster.currentHP} / {activeMonster.maxHP}</div>
-            <div className="dmap-warning-tip">⚔ Complete chores to fight!</div>
-            <div className="dmap-warning-gold">Reward: {activeMonster.gold}g + 3 moves</div>
+            <div className="dmap-warning-tip">⚔ Erledige Aufgaben zum Kämpfen!</div>
+            <div className="dmap-warning-gold">Belohnung: {activeMonster.gold}g + 3 Züge</div>
           </div>
         )}
         {activeMonster && !inCombat && (
           <div className="dmap-monster-warning">
             <DungeonMonsterSprite id={activeMonster.id} dp={60} />
             <div className="dmap-warning-name">{activeMonster.name}</div>
-            <div className="dmap-warning-tip">Complete a chore to defeat it</div>
+            <div className="dmap-warning-tip">Erledige eine Aufgabe, um es zu besiegen</div>
           </div>
         )}
         {!activeMonster && pendingMoves === 0 && (
           <div className="dmap-no-moves">
             <div className="dmap-no-moves-icon">⚡</div>
-            <div className="dmap-no-moves-text">Complete chores to earn moves</div>
+            <div className="dmap-no-moves-text">Erledige Aufgaben, um Züge zu verdienen</div>
           </div>
         )}
       </div>
@@ -406,8 +406,8 @@ export default function DungeonMap({ player, dungeonMap, allPlayers = [], allDun
       {/* ── Centre: map + d-pad ── */}
       <div className="dmap-center">
         <div className="dmap-title-row">
-          <span className="dmap-main-title">⚔ {player.name}&apos;s Dungeon</span>
-          <span style={{ fontFamily: 'var(--pixel)', fontSize: 9, color: '#b88cff', marginLeft: 10 }}>Floor {floor}</span>
+          <span className="dmap-main-title">⚔ Verlies von {player.name}</span>
+          <span style={{ fontFamily: 'var(--pixel)', fontSize: 9, color: '#b88cff', marginLeft: 10 }}>Ebene {floor}</span>
         </div>
 
         {/* Viewport wrapper — positions the torch-light overlay and d-pad relative to the grid */}
@@ -516,16 +516,16 @@ export default function DungeonMap({ player, dungeonMap, allPlayers = [], allDun
 
       {/* ── Right sidebar ── */}
       <div className="dmap-sidebar">
-        <div className="dmap-sidebar-title">HOW TO PLAY</div>
+        <div className="dmap-sidebar-title">SPIELANLEITUNG</div>
         <div className="dmap-guide">
           {[
-            ['⚔', 'Each chore earns 2 moves (or 1 while in combat)'],
-            ['☠', 'Dungeon monsters take multiple chores to defeat — earn gold + 3 moves'],
-            ['◇', 'Find the key, then the locked chest for bonus gold'],
-            ['▼', 'Stairs descend each floor — deeper = richer'],
-            ['▲', 'Stairs up return to the previous floor'],
-            ['?', 'Danger tiles are hidden until you enter'],
-            ['⭐', 'New day grants bonus moves — dungeon progress never resets'],
+            ['⚔', 'Jede Aufgabe bringt 2 Züge (oder 1 im Kampf)'],
+            ['☠', 'Verlies-Monster brauchen mehrere Aufgaben — bringen Gold + 3 Züge'],
+            ['◇', 'Finde den Schlüssel, dann die verschlossene Truhe für Bonusgold'],
+            ['▼', 'Treppen führen tiefer — tiefer = reicher'],
+            ['▲', 'Treppen nach oben führen zur vorherigen Ebene zurück'],
+            ['?', 'Gefahrenfelder sind verborgen, bis du sie betrittst'],
+            ['⭐', 'Ein neuer Tag bringt Bonuszüge — Verlies-Fortschritt wird nie zurückgesetzt'],
           ].map(([icon, text]) => (
             <div key={text} className="dmap-guide-row">
               <span className="dmap-guide-icon">{icon}</span>

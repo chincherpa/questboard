@@ -21,8 +21,8 @@ Thanks for your interest! Questboard is a family chore tracker — contributions
 **Frontend** (hot-reload on `:5174`):
 ```bash
 cd frontend
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 **Backend** (auto-reload API on `:5050`):

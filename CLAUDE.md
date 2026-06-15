@@ -7,13 +7,13 @@ Pixel art RPG chore tracker for families. Each player picks a hero and fights a 
 - **Frontend**: React 18 + Vite, plain CSS, no component library. Source in `frontend/src/`.
 - **Backend**: Python FastAPI (`backend/main.py`), single-file API, no ORM.
 - **Data**: JSON files on disk (`backend/data/state.json`, `config.json`). No database.
-- **Deployment**: Single Docker image (`Dockerfile` at root), nginx serves the built frontend and proxies `/api/*` to uvicorn on port 5050. Published as `ghcr.io/thillygooth/questboard:latest`.
+- **Deployment**: Single local process — FastAPI (uvicorn) serves the built frontend (`frontend/dist`) and the `/api/*` endpoints together on port 5050. See `setup.ps1` / `start.ps1`.
 
 ## Dev
 
 ```bash
 # Frontend - hot-reload on :5174
-cd frontend && npm install && npm run dev
+cd frontend && pnpm install && pnpm dev
 
 # Backend - auto-reload on :5050
 cd backend && pip install -r requirements.txt
@@ -53,10 +53,11 @@ Vite proxies `/api/*` to the backend automatically.
 - Solo chores: personal tasks tracked per player
 - Kids mode uses easier monster scaling
 
-## Docker build
+## Build & run (production)
 
-```bash
-docker build -t questboard . && docker run -p 8099:8099 -v ./data:/data questboard
+```powershell
+.\setup.ps1   # install backend deps + build frontend (pnpm build)
+.\start.ps1   # run uvicorn on :5050, serving dist + /api
 ```
 
-The root `Dockerfile` builds the frontend and copies the dist into the image alongside the backend.
+`backend/main.py` mounts `frontend/dist` at `/` when present, so one process serves UI and API.

@@ -42,46 +42,25 @@ Each family member picks a hero and fights a daily monster. Complete chores to d
 | 📅 Week start day | Configurable Monday or Sunday weekly reset |
 | 💾 Backup and restore | Export and import save data |
 
-📖 **[Full game guide](questboard/DOCS.md)** - hero classes, dungeon mechanics, combat, badges, power-ups, and more.
+📖 **[Full game guide](DOCS.md)** - hero classes, dungeon mechanics, combat, badges, power-ups, and more.
 
 ---
 
 ## Install
 
-### Home Assistant
+Run Questboard as a single local process — FastAPI serves the built frontend and the API together on one URL.
 
-In the HA Terminal add-on:
+**Prerequisites:** Python 3.11+ (3.13 works), Node.js LTS, and [pnpm](https://pnpm.io/installation) (`corepack enable && corepack prepare pnpm@latest --activate`).
 
-```bash
-mkdir -p /mnt/data/supervisor/questboard/data
-docker run -d --restart unless-stopped --name questboard -p 8099:8099 \
-  -v /mnt/data/supervisor/questboard/data:/data \
-  ghcr.io/thillygooth/questboard:latest
+```powershell
+# One-time: install Python deps and build the frontend
+.\setup.ps1
+
+# Start the app (opens http://localhost:5050)
+.\start.ps1
 ```
 
-Then add it to your HA sidebar in `configuration.yaml`:
-
-```yaml
-panel_iframe:
-  questboard:
-    title: "Questboard"
-    url: "http://<your-ha-ip>:8099"
-    icon: mdi:sword-cross
-    require_admin: false
-```
-
-Replace `<your-ha-ip>` with your Home Assistant IP, found under **Settings → System → Network**. Restart HA to apply.
-
-### Docker (any host)
-
-```bash
-mkdir -p /opt/questboard/data
-docker run -d --restart unless-stopped --name questboard -p 8099:8099 \
-  -v /opt/questboard/data:/data \
-  ghcr.io/thillygooth/questboard:latest
-```
-
-Open `http://localhost:8099`. Use any writable path for the data volume.
+Or double-click `start.bat`. Game data is stored in the `data\` folder next to the scripts. After changing frontend source, re-run `pnpm build` (or `.\setup.ps1`) to rebuild.
 
 ---
 
@@ -103,7 +82,7 @@ After launch, tap **Settings** to edit anything without re-running the wizard.
 
 ```bash
 # Frontend - hot-reload dev server on :5174
-cd frontend && npm install && npm run dev
+cd frontend && pnpm install && pnpm dev
 
 # Backend - auto-reload API server on :5050
 cd backend && pip install -r requirements.txt

@@ -150,13 +150,13 @@ export function dungeonMoveResult(mapState, dx, dy, dayKey, playerMode, luckLeve
     const data = generateFloor(dayKey, nf);
     data.grid[data.stairsUpPos[1]][data.stairsUpPos[0]] = 'stairs_up';
     const [nsx, nsy] = data.startPos;
-    return { newMap: { ...mapState, grid: data.grid, pos: data.startPos, startPos: data.startPos, explored: [`${nsx},${nsy}`], pendingMoves: mapState.pendingMoves - 1, activeMonster: null, floor: nf, hasKey: false, lockedChestOpened: false }, goldDelta: 0, event: { kind: 'stairs_down', label: `Descended to floor ${nf}` } };
+    return { newMap: { ...mapState, grid: data.grid, pos: data.startPos, startPos: data.startPos, explored: [`${nsx},${nsy}`], pendingMoves: mapState.pendingMoves - 1, activeMonster: null, floor: nf, hasKey: false, lockedChestOpened: false }, goldDelta: 0, event: { kind: 'stairs_down', label: `Hinab in Ebene ${nf}` } };
   }
   if (roomType === 'stairs_up' && floor > 1) {
     const nf = floor - 1;
     const data = generateFloor(dayKey, nf);
     const [nsx, nsy] = data.startPos;
-    return { newMap: { ...mapState, grid: data.grid, pos: data.startPos, startPos: data.startPos, explored: [`${nsx},${nsy}`], pendingMoves: mapState.pendingMoves - 1, activeMonster: null, floor: nf, hasKey: false, lockedChestOpened: false }, goldDelta: 0, event: { kind: 'stairs_up', label: `Ascended to floor ${nf}` } };
+    return { newMap: { ...mapState, grid: data.grid, pos: data.startPos, startPos: data.startPos, explored: [`${nsx},${nsy}`], pendingMoves: mapState.pendingMoves - 1, activeMonster: null, floor: nf, hasKey: false, lockedChestOpened: false }, goldDelta: 0, event: { kind: 'stairs_up', label: `Hinauf in Ebene ${nf}` } };
   }
 
   // Safety: block movement while in active dungeon combat
@@ -167,31 +167,31 @@ export function dungeonMoveResult(mapState, dx, dy, dayKey, playerMode, luckLeve
 
   if (!alreadyVisited) {
     switch (roomType) {
-      case 'gold_s':  goldDelta = Math.round((1 + (h % 2))  * totalMult); event = { kind: 'gold',   label: 'Found coins',           gold: goldDelta }; break;
-      case 'gold_l':  goldDelta = Math.round((2 + (h % 4))  * totalMult); event = { kind: 'gold',   label: 'Found treasure',         gold: goldDelta }; break;
-      case 'chest':   goldDelta = Math.round((5 + (h % 5))  * totalMult); event = { kind: 'chest',  label: 'Treasure chest!',        gold: goldDelta }; break;
+      case 'gold_s':  goldDelta = Math.round((1 + (h % 2))  * totalMult); event = { kind: 'gold',   label: 'Münzen gefunden',        gold: goldDelta }; break;
+      case 'gold_l':  goldDelta = Math.round((2 + (h % 4))  * totalMult); event = { kind: 'gold',   label: 'Schatz gefunden',        gold: goldDelta }; break;
+      case 'chest':   goldDelta = Math.round((5 + (h % 5))  * totalMult); event = { kind: 'chest',  label: 'Schatztruhe!',           gold: goldDelta }; break;
       case 'trap': {
         goldDelta = -Math.max(1, Math.round((3 + (h % 7) + Math.floor(floor/2)) * (1 - luckLevel * 0.6)));
-        event = { kind: 'trap', label: 'Triggered a trap!', gold: -goldDelta }; break;
+        event = { kind: 'trap', label: 'Falle ausgelöst!', gold: -goldDelta }; break;
       }
       case 'monster': {
         const m = MONSTERS[h % MONSTERS.length];
         const isKid = playerMode === 'kids';
         const maxHP = isKid ? m.kidHP : m.adultHP;
         newActiveMonster = { id: m.id, name: m.name, gold: isKid ? m.kidGold : m.gold, maxHP, currentHP: maxHP, pos: [nx, ny] };
-        event = { kind: 'monster', label: `${m.name} blocks the way!` }; break;
+        event = { kind: 'monster', label: `${m.name} versperrt den Weg!` }; break;
       }
-      case 'key': hasKey = true; goldDelta = Math.round(1 * totalMult); event = { kind: 'key', label: 'Found the floor key!', gold: goldDelta }; break;
+      case 'key': hasKey = true; goldDelta = Math.round(1 * totalMult); event = { kind: 'key', label: 'Ebenenschlüssel gefunden!', gold: goldDelta }; break;
       case 'locked_chest':
-        if (hasKey) { goldDelta = Math.round((10 + (h % 8)) * totalMult); hasKey = false; lockedChestOpened = true; event = { kind: 'locked_chest', label: 'Unlocked the bonus chest!', gold: goldDelta }; }
-        else if (!lockedChestOpened) { event = { kind: 'locked_chest_locked', label: 'Locked! Find the key first.' }; }
+        if (hasKey) { goldDelta = Math.round((10 + (h % 8)) * totalMult); hasKey = false; lockedChestOpened = true; event = { kind: 'locked_chest', label: 'Bonustruhe aufgeschlossen!', gold: goldDelta }; }
+        else if (!lockedChestOpened) { event = { kind: 'locked_chest_locked', label: 'Verschlossen! Finde zuerst den Schlüssel.' }; }
         break;
       default: break;
     }
   } else if (roomType === 'locked_chest' && !lockedChestOpened && hasKey) {
     goldDelta = Math.round((10 + (h % 8)) * totalMult);
     hasKey = false; lockedChestOpened = true;
-    event = { kind: 'locked_chest', label: 'Unlocked the bonus chest!', gold: goldDelta };
+    event = { kind: 'locked_chest', label: 'Bonustruhe aufgeschlossen!', gold: goldDelta };
   }
 
   return { newMap: { ...mapState, pos: [nx, ny], explored: newExplored, pendingMoves: mapState.pendingMoves - 1, activeMonster: newActiveMonster, hasKey, lockedChestOpened }, goldDelta, event };

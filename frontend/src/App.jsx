@@ -74,8 +74,8 @@ function applyAutoResets(raw, players, weekStartDay = 1) {
             state.gold = { ...state.gold, [pl.id]: Math.max(0, (state.gold[pl.id] || 0) - m.atk) };
             state.monsterPenalties = { ...state.monsterPenalties, [pKey]: true };
             state.history = [...(state.history || []), { type: 'penalty', player: pl.name, name: m.name, pts: m.atk, ts: Date.now() }];
-            const taunt = MONSTER_TAUNTS[m.id] || `${m.name} attacks!`;
-            penaltyMsgs.push(`⚠ ${pl.name}: ${taunt} -${m.atk} gold`);
+            const taunt = MONSTER_TAUNTS[m.id] || `${m.name} greift an!`;
+            penaltyMsgs.push(`⚠ ${pl.name}: ${taunt} -${m.atk} Gold`);
           }
         }
       });
@@ -304,7 +304,7 @@ export default function App() {
     const chore = activeChores.find(c => c.id === choreId);
 
     // Optional confirmation to prevent accidental taps
-    if (config?.confirmChores && !confirm(`Complete ${chore.name}?`)) return;
+    if (config?.confirmChores && !confirm(`${chore.name} erledigen?`)) return;
     const storeKey = chore.freq === 'daily' ? 'dailyDone' : chore.freq === 'weekly' ? 'weeklyDone' : 'monthlyDone';
     const store = serverState[storeKey];
     const doneKey = choreDoneKey(chore, selected);
@@ -364,8 +364,8 @@ export default function App() {
       await updateState(newState);
       playHit(chore.pts);
       showToast(tokenEarned
-        ? `${player.name}: ⚡ OVERKILL! Power Token banked!`
-        : `${player.name}: ⚡ Overkill! ${finalCharge}/${OVERKILL_CHARGE_GOAL} charged`);
+        ? `${player.name}: ⚡ OVERKILL! Power-Token gesichert!`
+        : `${player.name}: ⚡ Overkill! ${finalCharge}/${OVERKILL_CHARGE_GOAL} geladen`);
       return;
     }
 
@@ -491,18 +491,18 @@ export default function App() {
     }
 
     const comboTag  = combo > 1            ? ` x${combo} COMBO!`                                   : '';
-    const critTag   = isCrit               ? ' CRIT!'                                               : '';
+    const critTag   = isCrit               ? ' KRIT!'                                               : '';
     const bonusTag  = isBonus              ? ' BONUS!'                                              : '';
     const levelTag  = leveledUp            ? ` LVL UP ${newLevel}!`                                 : '';
-    const luckyTag  = isLucky              ? ` +${luckyGold} lucky gold!`                           : '';
-    const streakTag = justKilled && currentStreak >= 3 ? ` ${currentStreak}-day streak x${sMultiplier}!` : '';
-    const lootTag   = loot                 ? ` ${loot.icon} Found ${loot.name}!`                    : '';
+    const luckyTag  = isLucky              ? ` +${luckyGold} Glücksgold!`                           : '';
+    const streakTag = justKilled && currentStreak >= 3 ? ` ${currentStreak}-Tage-Serie x${sMultiplier}!` : '';
+    const lootTag   = loot                 ? ` ${loot.icon} ${loot.name} gefunden!`                 : '';
     const badgeTag  = newBadgeIds.length   ? ` 🏅 ${BADGES.find(b => b.id === newBadgeIds[0])?.name}!` : '';
     const dungeonTag = dungeonGoldBonus > 0 ? ` [☠ ${dungeonKillName} +${dungeonGoldBonus}g]` : dungeonFightMsg ? ` [${dungeonFightMsg}]` : '';
 
     const msg = justKilled
-      ? `${player.name} slew ${m.name}!${critTag} +${totalGoldGain}g${streakTag}${luckyTag}${lootTag}${levelTag}${badgeTag}${dungeonTag}`
-      : `${player.name} hits for ${actualPts}!${critTag}${comboTag}${bonusTag} HP:${hp}/${m.maxHP}${lootTag}${dungeonTag}`;
+      ? `${player.name} bezwang ${m.name}!${critTag} +${totalGoldGain}g${streakTag}${luckyTag}${lootTag}${levelTag}${badgeTag}${dungeonTag}`
+      : `${player.name} trifft für ${actualPts}!${critTag}${comboTag}${bonusTag} HP:${hp}/${m.maxHP}${lootTag}${dungeonTag}`;
     showToast(msg);
   }, [selected, serverState, players, activeChores, bonusChoreId, updateState, showToast]);
 
@@ -543,7 +543,7 @@ export default function App() {
       };
       await updateState(newState);
       playUndo();
-      showToast(`${player.name} undid: ${chore.name}`);
+      showToast(`${player.name} hat rückgängig gemacht: ${chore.name}`);
       return;
     }
 
@@ -568,7 +568,7 @@ export default function App() {
 
     await updateState(newState);
     playUndo();
-    showToast(`${player.name} undid: ${chore.name}`);
+    showToast(`${player.name} hat rückgängig gemacht: ${chore.name}`);
   }, [selected, serverState, players, activeChores, updateState, showToast]);
 
   const redeemReward = useCallback(async (rewardId) => {
@@ -577,7 +577,7 @@ export default function App() {
     const player = players.find(p => p.id === selected);
     const gold = serverState.gold[selected] || 0;
     if (gold < reward.cost) return;
-    if (!confirm(`Redeem "${reward.name}" for ${reward.cost} gold?`)) return;
+    if (!confirm(`„${reward.name}" für ${reward.cost} Gold einlösen?`)) return;
 
     const prog = serverState.badgeProgress?.[selected] || { monsters_killed: 0, rewards_redeemed: 0, lucky_count: 0, penalty_free_days: 0 };
     const newProg = { ...prog, rewards_redeemed: prog.rewards_redeemed + 1 };
@@ -602,7 +602,7 @@ export default function App() {
     await updateState(newState);
     playRedeem();
     const badgeTag = newBadgeIds.length ? ` 🏅 ${BADGES.find(b => b.id === newBadgeIds[0])?.name}!` : '';
-    showToast(`${player.name} redeemed: ${reward.name}!${badgeTag}`);
+    showToast(`${player.name} hat eingelöst: ${reward.name}!${badgeTag}`);
   }, [selected, serverState, players, activeRewards, updateState, showToast]);
 
   const handlePrestige = useCallback(async (playerId) => {
@@ -611,7 +611,7 @@ export default function App() {
     const xp = serverState.xp?.[playerId] || 0;
     const { level } = getLevelFromXP(xp);
     if (level < 10) return;
-    if (!confirm(`${player.name} will prestige! XP resets to 0 but you earn +5% gold on every kill forever. Continue?`)) return;
+    if (!confirm(`${player.name} macht Prestige! EP werden auf 0 zurückgesetzt, aber du erhältst für immer +5% Gold bei jedem Sieg. Fortfahren?`)) return;
     const currentPrestige = (serverState.prestige?.[playerId] || 0) + 1;
     const currentBadges = serverState.badges?.[playerId] || [];
     const newBadges = currentBadges.includes('prestige_1') ? currentBadges : [...currentBadges, 'prestige_1'];
@@ -623,7 +623,7 @@ export default function App() {
       history: [...(serverState.history || []), { type: 'badge', player: player.name, name: 'Prestige', icon: '🌟', ts: Date.now() }],
     };
     await updateState(newState);
-    showToast(`${player.name} prestiged! +${currentPrestige * 5}% gold bonus forever! ⭐`);
+    showToast(`${player.name} hat Prestige gemacht! +${currentPrestige * 5}% Goldbonus für immer! ⭐`);
   }, [serverState, players, updateState, showToast]);
 
   const handleSelectTitle = useCallback(async (playerId, badgeId) => {
@@ -658,7 +658,7 @@ export default function App() {
       history: [...(serverState.history || []), { type: 'bounty_post', player: player.name, name: title, pts: gold, ts: Date.now() }],
     };
     await updateState(newState);
-    showToast(`${player.name} posted: ${title} (${gold}g offered)`);
+    showToast(`${player.name} hat ausgeschrieben: ${title} (${gold}g geboten)`);
   }, [selected, serverState, players, updateState, showToast]);
 
   const claimBounty = useCallback(async (bountyId) => {
@@ -676,7 +676,7 @@ export default function App() {
     };
     await updateState(newState);
     playRedeem();
-    showToast(`${player.name} completed bounty: ${bounty.title}! +${bounty.gold}g`);
+    showToast(`${player.name} hat Auftrag erfüllt: ${bounty.title}! +${bounty.gold}g`);
   }, [selected, serverState, players, updateState, showToast]);
 
   const cancelBounty = useCallback(async (bountyId) => {
@@ -691,7 +691,7 @@ export default function App() {
       history: [...(serverState.history || []), { type: 'bounty_cancel', player: player.name, name: bounty.title, pts: bounty.gold, ts: Date.now() }],
     };
     await updateState(newState);
-    showToast(`${player.name} canceled: ${bounty.title} (+${bounty.gold}g returned)`);
+    showToast(`${player.name} hat abgebrochen: ${bounty.title} (+${bounty.gold}g zurück)`);
   }, [selected, serverState, players, updateState, showToast]);
 
   const handleDungeonMove = useCallback(async (playerId, dx, dy) => {
@@ -720,7 +720,7 @@ export default function App() {
   }, [serverState, players, updateState, showToast]);
 
   const resetWeek = useCallback(async () => {
-    if (!confirm('Reset chores, gold, and monsters? History will be kept.')) return;
+    if (!confirm('Aufgaben, Gold und Monster zurücksetzen? Der Verlauf bleibt erhalten.')) return;
     const zeros = Object.fromEntries(players.map(p => [p.id, 0]));
     const newState = {
       ...serverState,
@@ -755,7 +755,7 @@ export default function App() {
     a.download = `questboard-backup-${date}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast('Save exported!');
+    showToast('Spielstand exportiert!');
   }, [serverState, config, showToast]);
 
   const importSave = useCallback(() => {
@@ -769,10 +769,10 @@ export default function App() {
         const text = await file.text();
         const backup = JSON.parse(text);
         if (!backup.state || !backup.config) {
-          showToast('Invalid backup file: missing state or config');
+          showToast('Ungültige Sicherungsdatei: Zustand oder Konfiguration fehlt');
           return;
         }
-        if (!confirm('This will replace all current data. Continue?')) return;
+        if (!confirm('Dies ersetzt alle aktuellen Daten. Fortfahren?')) return;
         await Promise.all([
           fetch(`${API}/config`, {
             method: 'POST',
@@ -787,10 +787,10 @@ export default function App() {
         ]);
         setConfig(backup.config);
         setServerState(backup.state);
-        showToast('Save imported!');
+        showToast('Spielstand importiert!');
       } catch (err) {
         console.error('Import failed', err);
-        showToast('Import failed: invalid JSON file');
+        showToast('Import fehlgeschlagen: ungültige JSON-Datei');
       }
     };
     input.click();
@@ -873,7 +873,7 @@ export default function App() {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--text2)', fontSize: 14 }}>
-        Loading…
+        Lädt…
       </div>
     );
   }
@@ -912,26 +912,26 @@ export default function App() {
         <span className="title"><TileSprite tile={118} display={18} /> Questboard</span>
         <div className="tabs">
           <button className={`tab${currentTab === 'chores' ? ' active' : ''}`} onClick={() => setCurrentTab('chores')}>
-            <TileSprite tile={118} display={14} /> Chores
+            <TileSprite tile={118} display={14} /> Aufgaben
           </button>
           <button className={`tab${currentTab === 'rewards' ? ' active' : ''}`} onClick={() => setCurrentTab('rewards')}>
-            <TileSprite tile={72} display={14} /> Rewards
+            <TileSprite tile={72} display={14} /> Belohnungen
           </button>
           <button className={`tab${currentTab === 'dungeon' ? ' active' : ''}`} onClick={() => setCurrentTab('dungeon')}>
-            <TileSprite tile={117} display={14} /> Dungeon
+            <TileSprite tile={117} display={14} /> Verlies
           </button>
           <button className={`tab${currentTab === 'bounties' ? ' active' : ''}`} onClick={() => setCurrentTab('bounties')}>
-            📜 Bounties
+            📜 Aufträge
           </button>
           <button className={`tab${currentTab === 'history' ? ' active' : ''}`} onClick={() => setCurrentTab('history')}>
-            <TileSprite tile={116} display={14} /> History
+            <TileSprite tile={116} display={14} /> Verlauf
           </button>
         </div>
-        <button className="mute-btn" onClick={() => { const next = !muted; setMuted(next); setMutedState(next); }} title={muted ? 'Unmute sounds' : 'Mute sounds'}>{muted ? '\ud83d\udd07' : '\ud83d\udd0a'}</button>
-        <button className="reset-btn" onClick={() => setShowSettings(true)}><TileSprite tile={115} display={12} /> Settings</button>
-        <button className="reset-btn" onClick={resetWeek}><TileSprite tile={115} display={12} /> Reset week</button>
-        <button className="reset-btn" onClick={exportSave}><TileSprite tile={115} display={12} /> Export Save</button>
-        <button className="reset-btn" onClick={importSave}><TileSprite tile={115} display={12} /> Import Save</button>
+        <button className="mute-btn" onClick={() => { const next = !muted; setMuted(next); setMutedState(next); }} title={muted ? 'T\u00f6ne anschalten' : 'T\u00f6ne stummschalten'}>{muted ? '\ud83d\udd07' : '\ud83d\udd0a'}</button>
+        <button className="reset-btn" onClick={() => setShowSettings(true)}><TileSprite tile={115} display={12} /> Einstellungen</button>
+        <button className="reset-btn" onClick={resetWeek}><TileSprite tile={115} display={12} /> Woche zur\u00fccksetzen</button>
+        <button className="reset-btn" onClick={exportSave}><TileSprite tile={115} display={12} /> Spielstand exportieren</button>
+        <button className="reset-btn" onClick={importSave}><TileSprite tile={115} display={12} /> Spielstand importieren</button>
       </div>
 
       <div className="players">
@@ -973,7 +973,7 @@ export default function App() {
                 onUnclaimChore={unclaimChore}
                 bonusChoreId={bonusChoreId}
               />
-            : <div className="no-select">Select a hero above to see their quests.</div>
+            : <div className="no-select">Wähle oben einen Helden, um seine Quests zu sehen.</div>
         )}
         {currentTab === 'rewards' && (
           selected && selectedPlayer
@@ -983,7 +983,7 @@ export default function App() {
                 activeRewards={activeRewards}
                 onRedeemReward={redeemReward}
               />
-            : <div className="no-select">Select a hero above to browse the shop.</div>
+            : <div className="no-select">Wähle oben einen Helden, um den Shop zu durchstöbern.</div>
         )}
         {currentTab === 'dungeon' && (
           selected && selectedPlayer && state.dungeonMaps?.[selected]
@@ -995,7 +995,7 @@ export default function App() {
                 onMove={(dx, dy) => handleDungeonMove(selected, dx, dy)}
                 cellSize={44}
               />
-            : <div className="no-select">Select a hero above to explore the dungeon.</div>
+            : <div className="no-select">Wähle oben einen Helden, um das Verlies zu erkunden.</div>
         )}
         {currentTab === 'bounties' && (
           <BountyBoard

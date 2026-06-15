@@ -15,7 +15,7 @@ export default function RewardGrid({ player, gold, activeRewards, onRedeemReward
   return (
     <>
       <div className="section-label">
-        {player.name} — <span className="gold-coin" /> {gold} gold — tap to redeem
+        {player.name} — <span className="gold-coin" /> {gold} Gold — zum Einlösen tippen
       </div>
       <div className="rewards">
         {rewards.map(r => (

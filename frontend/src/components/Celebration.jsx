@@ -22,14 +22,14 @@ export default function Celebration({ onDismiss }) {
         <div className="celebration-gems">
           {GEMS.map((t, i) => <TileSprite key={i} tile={t} display={20} />)}
         </div>
-        <div className="celebration-title">DUNGEON CLEARED!</div>
-        <div className="celebration-subtitle">All monsters defeated today!</div>
+        <div className="celebration-title">VERLIES GESÄUBERT!</div>
+        <div className="celebration-subtitle">Heute alle Monster besiegt!</div>
         <div className="celebration-weapons">
           <TileSprite tile={118} display={36} />
           <TileSprite tile={72} display={36} />
           <TileSprite tile={118} display={36} />
         </div>
-        <div className="celebration-tap" onClick={dismiss}>Tap to continue</div>
+        <div className="celebration-tap" onClick={dismiss}>Zum Fortfahren tippen</div>
       </div>
     </div>
   );

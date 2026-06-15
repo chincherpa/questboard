@@ -79,10 +79,10 @@ export default function PlayerCard({ player, gold, xp, isSelected, onClick, mons
   const earnedBadges = (badges || []).map(id => BADGES.find(b => b.id === id)).filter(Boolean);
 
   const projectedReward = projectedOverkillRewardId ? POWER_UPS.find(p => p.id === projectedOverkillRewardId) : null;
-  const overkillTooltipLead = (storedPowerTokens > 0 || overkillCharge >= OVERKILL_CHARGE_GOAL) ? 'Tomorrow:' : 'On full:';
+  const overkillTooltipLead = (storedPowerTokens > 0 || overkillCharge >= OVERKILL_CHARGE_GOAL) ? 'Morgen:' : 'Bei voll:';
   const overkillTooltipCopy = (storedPowerTokens > 0 || overkillCharge >= OVERKILL_CHARGE_GOAL)
-    ? 'Auto-activates at reset.'
-    : 'Fill this bar to bank it for tomorrow.';
+    ? 'Aktiviert sich automatisch beim Reset.'
+    : 'Fülle diese Leiste, um sie für morgen zu sichern.';
 
   const earnedTitles = (badges || [])
     .map(badgeId => {
@@ -160,20 +160,20 @@ export default function PlayerCard({ player, gold, xp, isSelected, onClick, mons
         <div className="player-pts">
           <span className={`gold-coin${coinFlipping ? ' flipping' : ''}`} />
           <span className="pixel-num">{gold}</span>
-          <span className="player-pts-label">gold</span>
+          <span className="player-pts-label">Gold</span>
         </div>
         <div className="player-level">
           <span className="level-badge">Lv {level}</span>
-          <span className="crit-chance">{critPct}% crit</span>
-          <span className="luck-chance">{Math.round(luckForLevel(level) * 100)}% luck</span>
+          <span className="crit-chance">{critPct}% Krit</span>
+          <span className="luck-chance">{Math.round(luckForLevel(level) * 100)}% Glück</span>
         </div>
-        <div className="xp-bar-outer" title={`${xpInLevel}/${xpNeeded} XP`}>
+        <div className="xp-bar-outer" title={`${xpInLevel}/${xpNeeded} EP`}>
           <div className="xp-bar-fill" style={{ width: `${Math.round((xpInLevel / xpNeeded) * 100)}%`, background: `linear-gradient(90deg, ${player.color}, ${player.textColor})` }} />
         </div>
         {streak > 0 && (
           <div className="player-streak">
             <TileSprite tile={131} display={11} />
-            {streak}d streak
+            {streak} Tage Serie
           </div>
         )}
         {earnedBadges.length > 0 && (
@@ -192,7 +192,7 @@ export default function PlayerCard({ player, gold, xp, isSelected, onClick, mons
                 ? Math.max(0, Math.ceil((pu.activatedAt + pu.durationHours * 3600000 - Date.now()) / 3600000))
                 : null;
               return (
-                <span key={pu.id} className="powerup-icon" title={`${def.name} — ${remaining ? remaining + 'h left' : 'Active'}`}>
+                <span key={pu.id} className="powerup-icon" title={`${def.name} — ${remaining ? remaining + 'h übrig' : 'Aktiv'}`}>
                   <TileSprite tile={def.icon} display={14} />
                   {remaining != null && <span className="powerup-timer">{remaining}h</span>}
                 </span>
@@ -202,9 +202,9 @@ export default function PlayerCard({ player, gold, xp, isSelected, onClick, mons
         )}
         {storedPowerTokens > 0 && (
           <div className="power-token-row">
-            <span className="power-token-pill" title={`${storedPowerTokens} stored power token${storedPowerTokens === 1 ? '' : 's'}`}>
+            <span className="power-token-pill" title={`${storedPowerTokens} gesicherte${storedPowerTokens === 1 ? 's' : ''} Power-Token`}>
               <TileSprite tile={114} display={12} />
-              {storedPowerTokens} token{storedPowerTokens === 1 ? '' : 's'}
+              {storedPowerTokens} Token
             </span>
           </div>
         )}
@@ -212,7 +212,7 @@ export default function PlayerCard({ player, gold, xp, isSelected, onClick, mons
           <button
             className="prestige-btn"
             onClick={e => { e.stopPropagation(); onPrestige(player.id); }}
-            title="Prestige: reset XP for permanent gold bonus"
+            title="Prestige: EP zurücksetzen für dauerhaften Goldbonus"
           >⭐ PRESTIGE</button>
         )}
       </div>
@@ -256,7 +256,7 @@ export default function PlayerCard({ player, gold, xp, isSelected, onClick, mons
             </>
           )}
         </div>
-        <div className="hp-text"><span className="pixel-num">{dead ? `+${m.gold} gold!` : `HP ${hp}/${m.maxHP}`}</span></div>
+        <div className="hp-text"><span className="pixel-num">{dead ? `+${m.gold} Gold!` : `HP ${hp}/${m.maxHP}`}</span></div>
         {!dead && <HpSegBar hp={hp} maxHP={m.maxHP} low={low} />}
         {dead && (
           <div className={`overkill-panel${overkillCharge >= OVERKILL_CHARGE_GOAL ? ' ready' : ''}${projectedReward ? ' has-tooltip' : ''}`}>
@@ -266,12 +266,12 @@ export default function PlayerCard({ player, gold, xp, isSelected, onClick, mons
                 OVERKILL
               </span>
               <span className="overkill-label-count">
-                {overkillCharge >= OVERKILL_CHARGE_GOAL ? 'READY' : `${Math.min(overkillCharge, OVERKILL_CHARGE_GOAL)}/${OVERKILL_CHARGE_GOAL}`}
+                {overkillCharge >= OVERKILL_CHARGE_GOAL ? 'BEREIT' : `${Math.min(overkillCharge, OVERKILL_CHARGE_GOAL)}/${OVERKILL_CHARGE_GOAL}`}
               </span>
             </div>
             <OverkillBar charge={Math.min(overkillCharge, OVERKILL_CHARGE_GOAL)} goal={OVERKILL_CHARGE_GOAL} />
             <div className="overkill-hint">
-              {overkillCharge >= OVERKILL_CHARGE_GOAL ? 'Auto-activates as tomorrow\'s power-up.' : 'Extra chores charge tomorrow\'s power-up.'}
+              {overkillCharge >= OVERKILL_CHARGE_GOAL ? 'Aktiviert sich automatisch als Power-Up für morgen.' : 'Extra-Aufgaben laden das Power-Up für morgen.'}
             </div>
             {projectedReward && (
               <div className="overkill-tooltip" role="tooltip">
@@ -285,7 +285,7 @@ export default function PlayerCard({ player, gold, xp, isSelected, onClick, mons
             )}
           </div>
         )}
-        {!dead && <div className="atk-penalty">💀 -{m.atk}g at midnight</div>}
+        {!dead && <div className="atk-penalty">💀 -{m.atk}g um Mitternacht</div>}
       </div>
     </div>
   );

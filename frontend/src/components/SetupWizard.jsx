@@ -20,22 +20,22 @@ const PLAYER_COLORS = [
 ];
 
 const WHO_CYCLE = ['all', 'adults', 'kids'];
-const WHO_LABEL = { all: 'everyone', adults: 'adults', kids: 'kids' };
+const WHO_LABEL = { all: 'alle', adults: 'Erwachsene', kids: 'Kinder' };
 
 const REWARD_TIERS = [
-  { label: 'QUICK', max: 15  },
-  { label: 'MID',   max: 30  },
-  { label: 'BIG',   max: 65  },
-  { label: 'DREAM', max: 999 },
+  { label: 'SCHNELL', max: 15  },
+  { label: 'MITTEL',  max: 30  },
+  { label: 'GROSS',   max: 65  },
+  { label: 'TRAUM',   max: 999 },
 ];
 
 const TABS = ['party', 'quests', 'rewards', 'powerups', 'display'];
-const TAB_LABELS = { party: 'Party', quests: 'Quests', rewards: 'Rewards', powerups: 'Power-Ups', display: 'Display' };
+const TAB_LABELS = { party: 'Gruppe', quests: 'Quests', rewards: 'Belohnungen', powerups: 'Power-Ups', display: 'Anzeige' };
 
 const UI_SCALES = [
   { id: 'mini',   label: 'Mini',   desc: '100%' },
-  { id: 'heroic', label: 'Heroic', desc: '125%' },
-  { id: 'epic',   label: 'Epic',   desc: '175%' },
+  { id: 'heroic', label: 'Heroisch', desc: '125%' },
+  { id: 'epic',   label: 'Episch', desc: '175%' },
 ];
 
 function makeNewPlayer(existingPlayers = []) {
@@ -110,9 +110,9 @@ function StepWelcome({ onNext }) {
       <div style={{ fontSize: 48, marginBottom: 8 }}>⚔</div>
       <div style={{ color: '#f5c870', fontSize: 22, fontWeight: 'bold', marginBottom: 8 }}>QUESTBOARD</div>
       <p style={{ ...S.p, maxWidth: 360, margin: '0 auto 24px' }}>
-        Turn household chores into a pixel art RPG adventure. Each family member gets a hero and fights a monster every day  -  complete chores to deal damage and earn gold.
+        Verwandle Hausarbeit in ein Pixel-Art-RPG-Abenteuer. Jedes Familienmitglied bekommt einen Helden und kämpft jeden Tag gegen ein Monster  -  erledige Aufgaben, um Schaden zu machen und Gold zu verdienen.
       </p>
-      <button style={S.btnPrimary} onClick={onNext}>Start Setup →</button>
+      <button style={S.btnPrimary} onClick={onNext}>Einrichtung starten →</button>
     </div>
   );
 }
@@ -121,8 +121,8 @@ function StepWelcome({ onNext }) {
 function StepPlayerCount({ current, onSelect }) {
   return (
     <div>
-      <div style={S.h2}>How many heroes?</div>
-      <p style={S.p}>Each player gets their own character, monster, and gold.</p>
+      <div style={S.h2}>Wie viele Helden?</div>
+      <p style={S.p}>Jeder Spieler bekommt eine eigene Figur, ein eigenes Monster und eigenes Gold.</p>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         {[1, 2, 3, 4, 5, 6].map(n => (
           <button
@@ -149,7 +149,7 @@ function PlayerForm({ player, onChange }) {
         <label style={S.label}>NAME</label>
         <input
           style={S.input}
-          placeholder="Enter a name…"
+          placeholder="Namen eingeben…"
           value={player.name}
           onChange={e => onChange('name', e.target.value)}
           autoFocus
@@ -157,11 +157,11 @@ function PlayerForm({ player, onChange }) {
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <label style={S.label}>DIFFICULTY</label>
+        <label style={S.label}>SCHWIERIGKEIT</label>
         <div style={{ display: 'flex', gap: 8 }}>
           {[
-            { val: 'adults', label: 'Hard', desc: 'Adults' },
-            { val: 'kids',   label: 'Easy', desc: 'Kids'   },
+            { val: 'adults', label: 'Schwer', desc: 'Erwachsene' },
+            { val: 'kids',   label: 'Leicht', desc: 'Kinder'   },
           ].map(opt => (
             <button
               key={opt.val}
@@ -176,7 +176,7 @@ function PlayerForm({ player, onChange }) {
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <label style={S.label}>CLASS</label>
+        <label style={S.label}>KLASSE</label>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {CLASSES.map(cls => (
             <button
@@ -196,7 +196,7 @@ function PlayerForm({ player, onChange }) {
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <label style={S.label}>COLOR</label>
+        <label style={S.label}>FARBE</label>
         <div style={{ display: 'flex', gap: 8 }}>
           {PLAYER_COLORS.map((c, i) => (
             <button
@@ -221,24 +221,24 @@ function StepPlayerSetup({ player, playerIdx, total, onChange, onNext, onBack, o
   return (
     <div>
       <div style={S.h2}>
-        Hero {playerIdx + 1} of {total}
+        Held {playerIdx + 1} von {total}
         {player.name && <span style={{ color: '#f5c870' }}>  -  {player.name}</span>}
       </div>
       <PlayerForm player={player} onChange={onChange} />
       {!canAdvance && (
-        <div style={{ color: '#c05a5a', fontSize: 11, marginTop: 4 }}>Enter a name to continue.</div>
+        <div style={{ color: '#c05a5a', fontSize: 11, marginTop: 4 }}>Gib einen Namen ein, um fortzufahren.</div>
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
-        <button style={S.btn} onClick={onBack}>← Back</button>
+        <button style={S.btn} onClick={onBack}>← Zurück</button>
         <div style={{ display: 'flex', gap: 8 }}>
           {playerIdx > 0 && playerIdx + 1 < total && (
-            <button style={S.btn} onClick={onDone}>Done adding heroes</button>
+            <button style={S.btn} onClick={onDone}>Helden fertig hinzufügen</button>
           )}
           <button
             style={canAdvance ? S.btnPrimary : S.btnDisabled}
             onClick={canAdvance ? onNext : undefined}
           >
-            {playerIdx + 1 < total ? 'Next Hero →' : 'Choose Chores →'}
+            {playerIdx + 1 < total ? 'Nächster Held →' : 'Aufgaben wählen →'}
           </button>
         </div>
       </div>
@@ -269,7 +269,7 @@ function CustomForm({ form, setForm, onSubmit, onCancel, extraFields }) {
         <button
           style={{ ...S.btn, fontSize: 20, padding: '4px 10px', minWidth: 48 }}
           onClick={() => setShowPicker(p => !p)}
-          title="Pick icon"
+          title="Symbol wählen"
         >{form.icon || '❓'}</button>
       </div>
       {showPicker && (
@@ -287,14 +287,14 @@ function CustomForm({ form, setForm, onSubmit, onCancel, extraFields }) {
         {extraFields}
         <select style={{ ...S.input, flex: 1 }} value={form.who}
           onChange={e => setForm(f => ({ ...f, who: e.target.value }))}>
-          <option value="all">Everyone</option>
-          <option value="adults">Adults</option>
-          <option value="kids">Kids</option>
+          <option value="all">Alle</option>
+          <option value="adults">Erwachsene</option>
+          <option value="kids">Kinder</option>
         </select>
       </div>
       <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-        <button style={S.btnPrimary} onClick={onSubmit}>Add</button>
-        <button style={S.btn} onClick={onCancel}>Cancel</button>
+        <button style={S.btnPrimary} onClick={onSubmit}>Hinzufügen</button>
+        <button style={S.btn} onClick={onCancel}>Abbrechen</button>
       </div>
     </div>
   );
@@ -306,9 +306,10 @@ function ChoreSection({ players, enabledChores, onToggle, choreOverrides, onOver
   const [form, setForm] = useState({ name: '', icon: '⭐', pts: 2, who: 'all', freq: 'daily', mode: 'party' });
 
   const modes = new Set(players.map(p => p.mode));
-  const daily   = ALL_CHORES.filter(c => c.freq === 'daily');
-  const weekly  = ALL_CHORES.filter(c => c.freq === 'weekly');
-  const monthly = ALL_CHORES.filter(c => c.freq === 'monthly');
+  const byName  = (a, b) => a.name.localeCompare(b.name);
+  const daily   = ALL_CHORES.filter(c => c.freq === 'daily').sort(byName);
+  const weekly  = ALL_CHORES.filter(c => c.freq === 'weekly').sort(byName);
+  const monthly = ALL_CHORES.filter(c => c.freq === 'monthly').sort(byName);
 
   function isRelevant(who) {
     return who === 'all' || modes.has(who);
@@ -342,13 +343,13 @@ function ChoreSection({ players, enabledChores, onToggle, choreOverrides, onOver
         <button
           onClick={e => { e.stopPropagation(); onOverride(chore.id, { ...ov, mode: mode === 'party' ? 'solo' : 'party' }); }}
           style={{ background: 'none', border: '1px solid #3a3a5e', color: mode === 'solo' ? '#f5a0c0' : '#8dc447', fontSize: 10, padding: '2px 6px', cursor: 'pointer', minWidth: 34 }}
-          title={mode === 'solo' ? '1 player only  -  tap to make shared' : 'All players share  -  tap to make solo'}
-        >{mode === 'solo' ? '1P' : 'ALL'}</button>
+          title={mode === 'solo' ? 'Nur 1 Spieler  -  tippen, um zu teilen' : 'Alle Spieler teilen sich  -  tippen für Einzel'}
+        >{mode === 'solo' ? '1P' : 'ALLE'}</button>
         <CycleBtn value={who} onClick={e => { e.stopPropagation(); const next = WHO_CYCLE[(WHO_CYCLE.indexOf(who) + 1) % WHO_CYCLE.length]; onOverride(chore.id, { ...ov, who: next }); }} />
         <button
           onClick={e => { e.stopPropagation(); onOverride(chore.id, { ...ov, pts: pts >= 6 ? 1 : pts + 1 }); }}
           style={{ background: 'none', border: '1px solid #3a3a5e', color: '#f5c870', fontSize: 10, padding: '2px 6px', cursor: 'pointer', minWidth: 34 }}
-        >{pts}pts</button>
+        >{pts}P</button>
         {isCustom && (
           <button onClick={e => { e.stopPropagation(); onRemoveCustom(chore.id); }}
             style={{ background: 'none', border: 'none', color: '#7a3a3a', cursor: 'pointer', fontSize: 14, padding: '0 4px' }}>✕</button>
@@ -376,12 +377,12 @@ function ChoreSection({ players, enabledChores, onToggle, choreOverrides, onOver
 
   return (
     <div>
-      <Section title="DAILY" chores={daily} />
-      <Section title="WEEKLY" chores={weekly} />
-      <Section title="MONTHLY" chores={monthly} />
+      <Section title="TÄGLICH" chores={daily} />
+      <Section title="WÖCHENTLICH" chores={weekly} />
+      <Section title="MONATLICH" chores={monthly} />
       {customChores.length > 0 && (
         <div style={{ marginBottom: 20 }}>
-          <span style={{ color: '#f5c870', fontSize: 11, letterSpacing: 1 }}>CUSTOM</span>
+          <span style={{ color: '#f5c870', fontSize: 11, letterSpacing: 1 }}>EIGENE</span>
           {customChores.map(c => <ChoreRow key={c.id} chore={c} isCustom />)}
         </div>
       )}
@@ -392,22 +393,22 @@ function ChoreSection({ players, enabledChores, onToggle, choreOverrides, onOver
           extraFields={
             <>
               <select style={{ ...S.input, flex: 1 }} value={form.pts} onChange={e => setForm(f => ({ ...f, pts: +e.target.value }))}>
-                {[1,2,3,4,5,6].map(n => <option key={n} value={n}>{n} pts</option>)}
+                {[1,2,3,4,5,6].map(n => <option key={n} value={n}>{n} P</option>)}
               </select>
               <select style={{ ...S.input, flex: 1 }} value={form.freq} onChange={e => setForm(f => ({ ...f, freq: e.target.value }))}>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
+                <option value="daily">Täglich</option>
+                <option value="weekly">Wöchentlich</option>
+                <option value="monthly">Monatlich</option>
               </select>
               <select style={{ ...S.input, flex: 1 }} value={form.mode} onChange={e => setForm(f => ({ ...f, mode: e.target.value }))}>
-                <option value="party">ALL (shared)</option>
-                <option value="solo">1P (per player)</option>
+                <option value="party">ALLE (geteilt)</option>
+                <option value="solo">1P (pro Spieler)</option>
               </select>
             </>
           }
         />
       ) : (
-        <button style={{ ...S.btn, width: '100%', marginBottom: 16 }} onClick={() => setAddingCustom(true)}>+ Add custom chore</button>
+        <button style={{ ...S.btn, width: '100%', marginBottom: 16 }} onClick={() => setAddingCustom(true)}>+ Eigene Aufgabe hinzufügen</button>
       )}
     </div>
   );
@@ -417,8 +418,8 @@ function ChoreSection({ players, enabledChores, onToggle, choreOverrides, onOver
 function StepChoreSelect({ players, enabledChores, onToggle, choreOverrides, onOverride, customChores, onAddCustom, onRemoveCustom, onBack, onNext }) {
   return (
     <div>
-      <div style={S.h2}>Choose your quests</div>
-      <p style={S.p}>Select chores. Green <b style={{ color: '#8dc447' }}>ALL</b> = shared by party; pink <b style={{ color: '#f5a0c0' }}>1P</b> = each player tracks independently.</p>
+      <div style={S.h2}>Wähle deine Quests</div>
+      <p style={S.p}>Wähle Aufgaben aus. Grün <b style={{ color: '#8dc447' }}>ALLE</b> = von der Gruppe geteilt; rosa <b style={{ color: '#f5a0c0' }}>1P</b> = jeder Spieler verfolgt sie einzeln.</p>
       <ChoreSection
         players={players}
         enabledChores={enabledChores} onToggle={onToggle}
@@ -426,8 +427,8 @@ function StepChoreSelect({ players, enabledChores, onToggle, choreOverrides, onO
         customChores={customChores} onAddCustom={onAddCustom} onRemoveCustom={onRemoveCustom}
       />
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-        <button style={S.btn} onClick={onBack}>← Back</button>
-        <button style={S.btnPrimary} onClick={onNext}>Next: Rewards →</button>
+        <button style={S.btn} onClick={onBack}>← Zurück</button>
+        <button style={S.btnPrimary} onClick={onNext}>Weiter: Belohnungen →</button>
       </div>
     </div>
   );
@@ -475,7 +476,7 @@ function RewardSection({ players, enabledRewards, onToggle, rewardOverrides, onO
           onChange={e => { const v = parseInt(e.target.value, 10); if (!isNaN(v) && v > 0) onOverride(reward.id, { ...ov, cost: v }); }}
           style={{ ...S.input, width: 52, padding: '2px 4px', fontSize: 11, textAlign: 'center', color: '#f5c870' }}
         />
-        <span style={{ color: '#7a6a3a', fontSize: 10 }}>gold</span>
+        <span style={{ color: '#7a6a3a', fontSize: 10 }}>Gold</span>
         {isCustom && (
           <button onClick={e => { e.stopPropagation(); onRemoveCustom(reward.id); }}
             style={{ background: 'none', border: 'none', color: '#7a3a3a', cursor: 'pointer', fontSize: 14, padding: '0 4px' }}>✕</button>
@@ -510,7 +511,7 @@ function RewardSection({ players, enabledRewards, onToggle, rewardOverrides, onO
       ))}
       {customRewards.length > 0 && (
         <div style={{ marginBottom: 20 }}>
-          <span style={{ color: '#f5c870', fontSize: 11, letterSpacing: 1 }}>CUSTOM</span>
+          <span style={{ color: '#f5c870', fontSize: 11, letterSpacing: 1 }}>EIGENE</span>
           {customRewards.map(r => <RewardRow key={r.id} reward={r} isCustom />)}
         </div>
       )}
@@ -522,12 +523,12 @@ function RewardSection({ players, enabledRewards, onToggle, rewardOverrides, onO
             <input
               type="number" min={1} max={999} value={form.cost}
               onChange={e => setForm(f => ({ ...f, cost: +e.target.value }))}
-              style={{ ...S.input, flex: 1 }} placeholder="Cost"
+              style={{ ...S.input, flex: 1 }} placeholder="Kosten"
             />
           }
         />
       ) : (
-        <button style={{ ...S.btn, width: '100%', marginBottom: 16 }} onClick={() => setAddingCustom(true)}>+ Add custom reward</button>
+        <button style={{ ...S.btn, width: '100%', marginBottom: 16 }} onClick={() => setAddingCustom(true)}>+ Eigene Belohnung hinzufügen</button>
       )}
     </div>
   );
@@ -537,8 +538,8 @@ function RewardSection({ players, enabledRewards, onToggle, rewardOverrides, onO
 function StepRewardSelect({ players, enabledRewards, onToggle, rewardOverrides, onOverride, customRewards, onAddCustom, onRemoveCustom, onBack, onLaunch, crtEnabled, onToggleCrt, uiScale, onChangeUiScale, animatedBg, onToggleAnimatedBg, weekStartDay, onChangeWeekStartDay, confirmChores, onToggleConfirmChores, displayOrientation, onChangeDisplayOrientation }) {
   return (
     <div>
-      <div style={S.h2}>Choose your rewards</div>
-      <p style={S.p}>Toggle rewards and set gold costs. Click the blue badge to change who can redeem it.</p>
+      <div style={S.h2}>Wähle deine Belohnungen</div>
+      <p style={S.p}>Schalte Belohnungen ein/aus und lege Goldkosten fest. Klicke auf das blaue Abzeichen, um zu ändern, wer sie einlösen kann.</p>
       <RewardSection
         players={players}
         enabledRewards={enabledRewards} onToggle={onToggle}
@@ -546,10 +547,10 @@ function StepRewardSelect({ players, enabledRewards, onToggle, rewardOverrides, 
         customRewards={customRewards} onAddCustom={onAddCustom} onRemoveCustom={onRemoveCustom}
       />
       <div style={{ marginTop: 20, borderTop: '1px solid #2a2a4a', paddingTop: 16 }}>
-        <div style={{ ...S.label, marginBottom: 10 }}>DISPLAY</div>
-        <div style={{ ...S.label, marginBottom: 6, fontSize: 10, color: '#8a8aaa' }}>WEEK STARTS ON</div>
+        <div style={{ ...S.label, marginBottom: 10 }}>ANZEIGE</div>
+        <div style={{ ...S.label, marginBottom: 6, fontSize: 10, color: '#8a8aaa' }}>WOCHE BEGINNT AM</div>
         <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-          {[{ id: 1, label: 'Monday' }, { id: 0, label: 'Sunday' }].map(opt => (
+          {[{ id: 1, label: 'Montag' }, { id: 0, label: 'Sonntag' }].map(opt => (
             <button
               key={opt.id}
               style={{ ...(weekStartDay === opt.id ? S.btnPrimary : S.btn), flex: 1, padding: '6px 4px', fontSize: 11 }}
@@ -564,34 +565,34 @@ function StepRewardSelect({ players, enabledRewards, onToggle, rewardOverrides, 
             style={{ ...(crtEnabled ? S.btnPrimary : S.btn), padding: '6px 14px', fontSize: 11 }}
             onClick={onToggleCrt}
           >
-            {crtEnabled ? 'CRT Scanlines ON' : 'CRT Scanlines OFF'}
+            {crtEnabled ? 'CRT-Scanlines AN' : 'CRT-Scanlines AUS'}
           </button>
-          <span style={{ color: '#5a5a7a', fontSize: 10 }}>Retro CRT overlay effect</span>
+          <span style={{ color: '#5a5a7a', fontSize: 10 }}>Retro-CRT-Overlay-Effekt</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
           <button
             style={{ ...(animatedBg ? S.btnPrimary : S.btn), padding: '6px 14px', fontSize: 11 }}
             onClick={onToggleAnimatedBg}
           >
-            {animatedBg ? '✓ Animated BG ON' : 'Animated BG OFF'}
+            {animatedBg ? '✓ Animierter HG AN' : 'Animierter HG AUS'}
           </button>
-          <span style={{ color: '#5a5a7a', fontSize: 10 }}>Disable if background flickers</span>
+          <span style={{ color: '#5a5a7a', fontSize: 10 }}>Deaktivieren, falls der Hintergrund flackert</span>
         </div>
       </div>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ ...S.label, marginBottom: 10 }}>CHORE CONFIRMATION</div>
+        <div style={{ ...S.label, marginBottom: 10 }}>AUFGABEN-BESTÄTIGUNG</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button
             style={{ ...(confirmChores ? S.btnPrimary : S.btn), padding: '6px 14px', fontSize: 11 }}
             onClick={onToggleConfirmChores}
           >
-            {confirmChores ? 'Confirm chores ON' : 'Confirm chores OFF'}
+            {confirmChores ? 'Aufgaben bestätigen AN' : 'Aufgaben bestätigen AUS'}
           </button>
-          <span style={{ color: '#5a5a7a', fontSize: 10 }}>Require confirmation before completing chores</span>
+          <span style={{ color: '#5a5a7a', fontSize: 10 }}>Vor dem Erledigen von Aufgaben eine Bestätigung verlangen</span>
         </div>
       </div>
       <div style={{ marginBottom: 20 }}>
-        <div style={{ ...S.label, marginBottom: 8 }}>UI SCALE</div>
+        <div style={{ ...S.label, marginBottom: 8 }}>UI-SKALIERUNG</div>
         <div style={{ display: 'flex', gap: 8 }}>
           {UI_SCALES.map(s => (
             <button
@@ -606,9 +607,9 @@ function StepRewardSelect({ players, enabledRewards, onToggle, rewardOverrides, 
         </div>
       </div>
       <div style={{ marginBottom: 20 }}>
-        <div style={{ ...S.label, marginBottom: 6 }}>DISPLAY ORIENTATION</div>
+        <div style={{ ...S.label, marginBottom: 6 }}>BILDSCHIRM-AUSRICHTUNG</div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {[{ id: 'landscape', label: 'Landscape', desc: '⬛ Wide' }, { id: 'portrait', label: 'Portrait', desc: '▬ Tall' }].map(o => (
+          {[{ id: 'landscape', label: 'Querformat', desc: '⬛ Breit' }, { id: 'portrait', label: 'Hochformat', desc: '▬ Hoch' }].map(o => (
             <button
               key={o.id}
               style={{ ...((displayOrientation ?? 'landscape') === o.id ? S.btnPrimary : S.btn), flex: 1, padding: '8px 4px', fontSize: 11 }}
@@ -621,8 +622,8 @@ function StepRewardSelect({ players, enabledRewards, onToggle, rewardOverrides, 
         </div>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16 }}>
-        <button style={S.btn} onClick={onBack}>← Back</button>
-        <button style={S.btnPrimary} onClick={onLaunch}>Launch the Adventure! ⚔</button>
+        <button style={S.btn} onClick={onBack}>← Zurück</button>
+        <button style={S.btnPrimary} onClick={onLaunch}>Abenteuer starten! ⚔</button>
       </div>
     </div>
   );
@@ -634,7 +635,7 @@ function TabParty({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer }) {
 
   return (
     <div>
-      <p style={S.p}>Edit player name and class inline. Tap the avatar to expand color and difficulty options.</p>
+      <p style={S.p}>Name und Klasse direkt bearbeiten. Tippe auf den Avatar, um Farb- und Schwierigkeitsoptionen anzuzeigen.</p>
       {players.map((p, i) => {
         const cls = CLASSES.find(c => c.id === p.class) || CLASSES[0];
         const isExpanded = expandedIdx === i;
@@ -644,14 +645,14 @@ function TabParty({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer }) {
               <div
                 style={{ width: 36, height: 36, background: p.color, border: `1px solid ${p.textColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
                 onClick={() => setExpandedIdx(isExpanded ? null : i)}
-                title="Expand options"
+                title="Optionen anzeigen"
               >
                 <TileSprite tile={cls.tile} scale={2} />
               </div>
               <input
                 style={{ ...S.input, flex: 1, padding: '6px 8px', fontSize: 13 }}
                 value={p.name}
-                placeholder="Hero name…"
+                placeholder="Heldenname…"
                 onChange={e => onUpdatePlayer(i, 'name', e.target.value)}
               />
               <select
@@ -666,20 +667,20 @@ function TabParty({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer }) {
               <button
                 style={{ background: 'none', border: 'none', color: '#5a5a8a', fontSize: 14, cursor: 'pointer', padding: '0 4px' }}
                 onClick={() => setExpandedIdx(isExpanded ? null : i)}
-                title={isExpanded ? 'Collapse' : 'Expand'}
+                title={isExpanded ? 'Einklappen' : 'Ausklappen'}
               >{isExpanded ? '▾' : '›'}</button>
             </div>
             {!p.name.trim() && (
-              <div style={{ color: '#c05a5a', fontSize: 10, marginTop: 4, paddingLeft: 46 }}>Name is required.</div>
+              <div style={{ color: '#c05a5a', fontSize: 10, marginTop: 4, paddingLeft: 46 }}>Name ist erforderlich.</div>
             )}
             {isExpanded && (
               <div style={{ paddingLeft: 46, marginTop: 12 }}>
                 <div style={{ marginBottom: 12 }}>
-                  <label style={S.label}>DIFFICULTY</label>
+                  <label style={S.label}>SCHWIERIGKEIT</label>
                   <div style={{ display: 'flex', gap: 8 }}>
                     {[
-                      { val: 'adults', label: 'Hard', desc: 'Adults' },
-                      { val: 'kids',   label: 'Easy', desc: 'Kids'   },
+                      { val: 'adults', label: 'Schwer', desc: 'Erwachsene' },
+                      { val: 'kids',   label: 'Leicht', desc: 'Kinder'   },
                     ].map(opt => (
                       <button
                         key={opt.val}
@@ -693,7 +694,7 @@ function TabParty({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer }) {
                   </div>
                 </div>
                 <div>
-                  <label style={S.label}>COLOR</label>
+                  <label style={S.label}>FARBE</label>
                   <div style={{ display: 'flex', gap: 8 }}>
                     {PLAYER_COLORS.map((c, ci) => (
                       <button
@@ -717,13 +718,13 @@ function TabParty({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer }) {
         <button
           style={{ ...S.btn, width: '100%', marginTop: 16 }}
           onClick={onAddPlayer}
-        >+ Add Hero</button>
+        >+ Held hinzufügen</button>
       )}
       {players.length > 1 && (
         <button
           style={{ ...S.btnDanger, width: '100%', marginTop: 8, padding: '6px 20px', fontSize: 11 }}
           onClick={() => onRemovePlayer(players.length - 1)}
-        >Remove {players[players.length - 1].name || 'Last Hero'}</button>
+        >{players[players.length - 1].name || 'Letzten Helden'} entfernen</button>
       )}
     </div>
   );
@@ -734,7 +735,7 @@ function TabParty({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer }) {
 function TabPowerUps({ powerUpSettings, onChange }) {
   return (
     <div>
-      <p style={S.p}>Power tokens are earned by dealing overkill damage after the daily monster is defeated. Configure which power-ups are available and how they trigger.</p>
+      <p style={S.p}>Power-Token werden durch Overkill-Schaden verdient, nachdem das Tagesmonster besiegt ist. Lege fest, welche Power-Ups verfügbar sind und wie sie ausgelöst werden.</p>
       {POWER_UPS.map(pu => {
         const cfg = powerUpSettings[pu.id] || { enabled: true, trigger: 'daily_chores', count: 5, durationHours: 24 };
         return (
@@ -755,7 +756,7 @@ function TabPowerUps({ powerUpSettings, onChange }) {
             {cfg.enabled && (
               <div style={{ marginTop: 10, paddingLeft: 44, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div>
-                  <span style={{ ...S.label, display: 'inline', marginRight: 8 }}>AUTO-TRIGGER</span>
+                  <span style={{ ...S.label, display: 'inline', marginRight: 8 }}>AUTO-AUSLÖSER</span>
                   <select
                     style={{ ...S.input, display: 'inline', width: 'auto', padding: '2px 8px', fontSize: 11 }}
                     value={cfg.trigger}
@@ -768,11 +769,11 @@ function TabPowerUps({ powerUpSettings, onChange }) {
                     onChange={e => { const v = parseInt(e.target.value, 10); if (!isNaN(v) && v > 0) onChange(pu.id, { ...cfg, count: v }); }}
                     style={{ ...S.input, display: 'inline', width: 44, padding: '2px 6px', fontSize: 11, marginLeft: 6, textAlign: 'center' }}
                   />
-                  <span style={{ color: '#5a5a8a', fontSize: 10, marginLeft: 4 }}>times</span>
+                  <span style={{ color: '#5a5a8a', fontSize: 10, marginLeft: 4 }}>mal</span>
                 </div>
                 {pu.effectType === 'timed' && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ ...S.label, display: 'inline', marginBottom: 0, marginRight: 6 }}>DURATION</span>
+                    <span style={{ ...S.label, display: 'inline', marginBottom: 0, marginRight: 6 }}>DAUER</span>
                     {DURATION_OPTIONS.map(h => (
                       <button
                         key={h}
@@ -796,9 +797,9 @@ function TabDisplay({ crtEnabled, onToggleCrt, uiScale, onChangeUiScale, animate
   return (
     <div>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ ...S.label, marginBottom: 10 }}>WEEK STARTS ON</div>
+        <div style={{ ...S.label, marginBottom: 10 }}>WOCHE BEGINNT AM</div>
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-          {[{ id: 1, label: 'Monday' }, { id: 0, label: 'Sunday' }].map(opt => (
+          {[{ id: 1, label: 'Montag' }, { id: 0, label: 'Sonntag' }].map(opt => (
             <button
               key={opt.id}
               style={{ ...(weekStartDay === opt.id ? S.btnPrimary : S.btn), flex: 1, padding: '8px 4px', fontSize: 11 }}
@@ -808,44 +809,44 @@ function TabDisplay({ crtEnabled, onToggleCrt, uiScale, onChangeUiScale, animate
             </button>
           ))}
         </div>
-        <div style={{ color: '#5a5a7a', fontSize: 10, marginBottom: 16 }}>Controls when weekly chores and gold reset</div>
+        <div style={{ color: '#5a5a7a', fontSize: 10, marginBottom: 16 }}>Legt fest, wann wöchentliche Aufgaben und Gold zurückgesetzt werden</div>
       </div>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ ...S.label, marginBottom: 10 }}>CRT EFFECT</div>
+        <div style={{ ...S.label, marginBottom: 10 }}>CRT-EFFEKT</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button
             style={{ ...(crtEnabled ? S.btnPrimary : S.btn), padding: '6px 14px', fontSize: 11 }}
             onClick={onToggleCrt}
           >
-            {crtEnabled ? '✓ CRT Scanlines ON' : 'CRT Scanlines OFF'}
+            {crtEnabled ? '✓ CRT-Scanlines AN' : 'CRT-Scanlines AUS'}
           </button>
-          <span style={{ color: '#5a5a7a', fontSize: 10 }}>Retro CRT overlay effect</span>
+          <span style={{ color: '#5a5a7a', fontSize: 10 }}>Retro-CRT-Overlay-Effekt</span>
         </div>
       </div>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ ...S.label, marginBottom: 10 }}>ANIMATED BACKGROUND</div>
+        <div style={{ ...S.label, marginBottom: 10 }}>ANIMIERTER HINTERGRUND</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button
             style={{ ...(animatedBg ? S.btnPrimary : S.btn), padding: '6px 14px', fontSize: 11 }}
             onClick={onToggleAnimatedBg}
           >
-            {animatedBg ? '✓ Animated BG ON' : 'Animated BG OFF'}
+            {animatedBg ? '✓ Animierter HG AN' : 'Animierter HG AUS'}
           </button>
-          <span style={{ color: '#5a5a7a', fontSize: 10 }}>Parallax dungeon background (disable if flickering on slower devices)</span>
+          <span style={{ color: '#5a5a7a', fontSize: 10 }}>Parallax-Verlies-Hintergrund (bei Flackern auf langsamen Geräten deaktivieren)</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
           <button
             style={{ ...(confirmChores ? S.btnPrimary : S.btn), padding: '6px 14px', fontSize: 11 }}
             onClick={onToggleConfirmChores}
           >
-            {confirmChores ? 'Confirm chores ON' : 'Confirm chores OFF'}
+            {confirmChores ? 'Aufgaben bestätigen AN' : 'Aufgaben bestätigen AUS'}
           </button>
-          <span style={{ color: '#5a5a7a', fontSize: 10 }}>Require confirmation before completing chores</span>
+          <span style={{ color: '#5a5a7a', fontSize: 10 }}>Vor dem Erledigen von Aufgaben eine Bestätigung verlangen</span>
         </div>
       </div>
       <div style={{ marginBottom: 24 }}>
         <div style={{ ...S.label, marginBottom: 6 }}>UI SCALE</div>
-        <p style={{ ...S.p, fontSize: 11 }}>Scale the entire interface for your display. Heroic and Epic are great for tablets or large screens.</p>
+        <p style={{ ...S.p, fontSize: 11 }}>Skaliere die gesamte Oberfläche für deinen Bildschirm. Heroisch und Episch eignen sich super für Tablets oder große Bildschirme.</p>
         <div style={{ display: 'flex', gap: 8 }}>
           {UI_SCALES.map(s => (
             <button
@@ -861,9 +862,9 @@ function TabDisplay({ crtEnabled, onToggleCrt, uiScale, onChangeUiScale, animate
       </div>
       <div>
         <div style={{ ...S.label, marginBottom: 6 }}>DISPLAY ORIENTATION</div>
-        <p style={{ ...S.p, fontSize: 11 }}>Landscape is the default for kitchen tablets. Portrait stacks the layout vertically for fridge or tall screens.</p>
+        <p style={{ ...S.p, fontSize: 11 }}>Querformat ist Standard für Küchen-Tablets. Hochformat stapelt das Layout vertikal für Kühlschrank- oder hohe Bildschirme.</p>
         <div style={{ display: 'flex', gap: 8 }}>
-          {[{ id: 'landscape', label: 'Landscape', desc: '⬛ Wide' }, { id: 'portrait', label: 'Portrait', desc: '▬ Tall' }].map(o => (
+          {[{ id: 'landscape', label: 'Querformat', desc: '⬛ Breit' }, { id: 'portrait', label: 'Hochformat', desc: '▬ Hoch' }].map(o => (
             <button
               key={o.id}
               style={{ ...(displayOrientation === o.id ? S.btnPrimary : S.btn), flex: 1, padding: '14px 4px', fontSize: 12 }}
@@ -989,9 +990,9 @@ export default function SetupWizard({ onComplete, onCancel, initialConfig }) {
       <div style={S.overlay}>
         <div style={S.card}>
           <div style={S.header}>
-            <span style={S.title}>⚔ EDIT SETTINGS</span>
+            <span style={S.title}>⚔ EINSTELLUNGEN BEARBEITEN</span>
             {onCancel && (
-              <button style={{ ...S.btn, padding: '4px 10px', fontSize: 11 }} onClick={onCancel}>✕ Cancel</button>
+              <button style={{ ...S.btn, padding: '4px 10px', fontSize: 11 }} onClick={onCancel}>✕ Abbrechen</button>
             )}
           </div>
           <div style={{ display: 'flex', borderBottom: '1px solid #2a2a4a', flexShrink: 0 }}>
@@ -1013,7 +1014,7 @@ export default function SetupWizard({ onComplete, onCancel, initialConfig }) {
           </div>
           <div style={S.body}>
             {launching ? (
-              <div style={{ textAlign: 'center', padding: '40px 0', color: '#c8d0e0' }}>Saving changes…</div>
+              <div style={{ textAlign: 'center', padding: '40px 0', color: '#c8d0e0' }}>Änderungen werden gespeichert…</div>
             ) : activeTab === 'party' ? (
               <TabParty
                 players={players}
@@ -1056,8 +1057,8 @@ export default function SetupWizard({ onComplete, onCancel, initialConfig }) {
             )}
           </div>
           <div style={S.footer}>
-            <span style={{ color: '#5a5a8a', fontSize: 11 }}>{players.length} hero{players.length !== 1 ? 'es' : ''}</span>
-            <button style={S.btnPrimary} onClick={handleLaunch}>Save Changes ✓</button>
+            <span style={{ color: '#5a5a8a', fontSize: 11 }}>{players.length} {players.length !== 1 ? 'Helden' : 'Held'}</span>
+            <button style={S.btnPrimary} onClick={handleLaunch}>Änderungen speichern ✓</button>
           </div>
         </div>
       </div>
@@ -1072,15 +1073,15 @@ export default function SetupWizard({ onComplete, onCancel, initialConfig }) {
       <div style={S.card}>
         {step > 0 && (
           <div style={S.header}>
-            <span style={S.title}>⚔ QUESTBOARD SETUP</span>
-            <span style={S.stepIndicator}>Step {stepNum} of 5</span>
+            <span style={S.title}>⚔ QUESTBOARD-EINRICHTUNG</span>
+            <span style={S.stepIndicator}>Schritt {stepNum} von 5</span>
           </div>
         )}
 
         <div style={S.body}>
           {launching ? (
             <div style={{ textAlign: 'center', padding: '40px 0', color: '#c8d0e0' }}>
-              Preparing your adventure…
+              Dein Abenteuer wird vorbereitet…
             </div>
           ) : step === 0 ? (
             <StepWelcome onNext={() => setStep(1)} />
@@ -1139,8 +1140,8 @@ export default function SetupWizard({ onComplete, onCancel, initialConfig }) {
 
         {step === 1 && (
           <div style={S.footer}>
-            <button style={S.btn} onClick={() => setStep(0)}>← Back</button>
-            <span style={{ color: '#5a5a8a', fontSize: 11 }}>tap a number above</span>
+            <button style={S.btn} onClick={() => setStep(0)}>← Zurück</button>
+            <span style={{ color: '#5a5a8a', fontSize: 11 }}>oben eine Zahl antippen</span>
           </div>
         )}
       </div>

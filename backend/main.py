@@ -1,8 +1,10 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
-import json, os
+from fastapi.staticfiles import StaticFiles
+import json, os, tempfile
 
 app = FastAPI()
+api = APIRouter(prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,
@@ -11,7 +13,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-_DATA_DIR   = os.environ.get("QUESTBOARD_DATA", "/data")
+_DEFAULT_DATA = os.path.join(os.path.dirname(__file__), "..", "data")
+_DATA_DIR   = os.environ.get("QUESTBOARD_DATA", _DEFAULT_DATA)
 STATE_FILE  = os.path.join(_DATA_DIR, "state.json")
 CONFIG_FILE = os.path.join(_DATA_DIR, "config.json")
 
@@ -19,7 +22,7 @@ CONFIG_FILE = os.path.join(_DATA_DIR, "config.json")
 def read_json(path):
     if os.path.exists(path):
         try:
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
             pass
@@ -27,24 +30,39 @@ def read_json(path):
 
 
 def write_json(path, data):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w") as f:
-        json.dump(data, f)
+    """Atomic write: serialize to a temp file in the same dir, fsync, then
+    os.replace over the target. A crash mid-write can never corrupt or
+    truncate the existing file -- the replace is atomic."""
+    directory = os.path.dirname(path)
+    os.makedirs(directory, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=directory, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except Exception:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        raise
 
 
-@app.get("/state")
+@api.get("/state")
 def get_state():
     return read_json(STATE_FILE) or {}
 
 
-@app.post("/state")
+@api.post("/state")
 async def post_state(request: Request):
     data = await request.json()
     write_json(STATE_FILE, data)
     return {"ok": True}
 
 
-@app.get("/config")
+@api.get("/config")
 def get_config():
     config = read_json(CONFIG_FILE)
     if config is None:
@@ -52,8 +70,17 @@ def get_config():
     return config
 
 
-@app.post("/config")
+@api.post("/config")
 async def post_config(request: Request):
     data = await request.json()
     write_json(CONFIG_FILE, data)
     return {"ok": True}
+
+
+app.include_router(api)
+
+# Built frontend (run `pnpm build` in frontend/). Mount last so it does not
+# shadow the /api routes. html=True serves index.html at the root.
+_DIST = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
+if os.path.isdir(_DIST):
+    app.mount("/", StaticFiles(directory=_DIST, html=True), name="static")

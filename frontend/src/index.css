@@ -283,7 +283,7 @@ body.crt::after {
 }
 
 .player-pts-label {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--text2);
   font-weight: 400;
 }
@@ -367,7 +367,7 @@ body.crt::after {
 
 .hp-text {
   font-family: var(--pixel);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--gold2);
   letter-spacing: 0.02em;
   text-align: center;
@@ -477,6 +477,12 @@ body.crt::after {
   grid-template-columns: 1fr 1fr;
   gap: 1.4rem;
   align-items: start;
+}
+
+.monthly-section { grid-column: 1 / -1; }
+
+@media (max-width: 700px) {
+  .chore-sections { grid-template-columns: 1fr; }
 }
 
 .chores {
@@ -797,7 +803,7 @@ body.crt::after {
 
 .level-badge {
   font-family: var(--pixel);
-  font-size: 8px;
+  font-size: 10px;
   color: #f0d060;
   background: rgba(255,200,0,0.12);
   border: 1px solid rgba(255,200,0,0.3);
@@ -807,14 +813,14 @@ body.crt::after {
 
 .crit-chance {
   font-family: var(--pixel);
-  font-size: 7px;
+  font-size: 10px;
   color: #a070e0;
   opacity: 0.85;
 }
 
 .luck-chance {
   font-family: var(--pixel);
-  font-size: 7px;
+  font-size: 10px;
   color: #70c0a0;
   opacity: 0.85;
 }
@@ -840,7 +846,7 @@ body.crt::after {
   display: flex;
   align-items: center;
   gap: 3px;
-  font-size: 9px;
+  font-size: 11px;
   font-family: 'PixelatedElegance', monospace;
   color: #e88040;
   margin-top: 3px;
@@ -1530,7 +1536,7 @@ body.crt::after {
 /* ── Monster midnight penalty ── */
 .atk-penalty {
   font-family: var(--pixel);
-  font-size: 7px;
+  font-size: 10px;
   color: rgba(180,80,80,0.75);
   margin-top: 3px;
   text-align: center;

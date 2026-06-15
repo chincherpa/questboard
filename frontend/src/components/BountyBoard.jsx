@@ -27,21 +27,21 @@ export default function BountyBoard({ players, selectedPlayerId, bounties = [], 
 
   return (
     <div className="bounty-board">
-      <div className="section-label">📜 Bounty Board</div>
+      <div className="section-label">📜 Auftragsbrett</div>
 
       {selectedPlayer && (
         <button className="bounty-post-btn" onClick={() => setShowCreate(v => !v)}>
-          {showCreate ? '✕ Cancel' : '+ Post Bounty'}
+          {showCreate ? '✕ Abbrechen' : '+ Auftrag ausschreiben'}
         </button>
       )}
 
       {showCreate && selectedPlayer && (
         <div className="bounty-create-form">
           <div style={{ marginBottom: 10 }}>
-            <div className="bounty-form-label">Quest Title</div>
+            <div className="bounty-form-label">Quest-Titel</div>
             <input
               className="bounty-input"
-              placeholder="e.g. Install vanity mirror"
+              placeholder="z.B. Spiegel aufhängen"
               value={form.title}
               onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
               maxLength={48}
@@ -62,7 +62,7 @@ export default function BountyBoard({ players, selectedPlayerId, bounties = [], 
           </div>
           <div style={{ display: 'flex', gap: 12, marginBottom: 12, alignItems: 'flex-start' }}>
             <div style={{ flex: 1 }}>
-              <div className="bounty-form-label">Gold Reward</div>
+              <div className="bounty-form-label">Goldbelohnung</div>
               <input
                 type="number"
                 className="bounty-input"
@@ -72,17 +72,17 @@ export default function BountyBoard({ players, selectedPlayerId, bounties = [], 
                 onChange={e => setForm(f => ({ ...f, goldReward: Math.max(1, parseInt(e.target.value) || 1) }))}
               />
               <div className="bounty-form-hint">
-                You have {creatorGold}g — locked in until claimed or canceled
+                Du hast {creatorGold}g — gebunden bis erfüllt oder abgebrochen
               </div>
             </div>
             <div style={{ flex: 1 }}>
-              <div className="bounty-form-label">Assign To</div>
+              <div className="bounty-form-label">Zuweisen an</div>
               <select
                 className="bounty-input"
                 value={form.assignedTo}
                 onChange={e => setForm(f => ({ ...f, assignedTo: e.target.value }))}
               >
-                <option value="">Anyone</option>
+                <option value="">Jeder</option>
                 {players.filter(p => p.id !== selectedPlayerId).map(p => (
                   <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
@@ -95,8 +95,8 @@ export default function BountyBoard({ players, selectedPlayerId, bounties = [], 
             onClick={handleCreate}
           >
             {canAfford
-              ? `Post Bounty (${form.goldReward}g)`
-              : creatorGold < 1 ? 'No gold to offer' : 'Not enough gold'}
+              ? `Auftrag ausschreiben (${form.goldReward}g)`
+              : creatorGold < 1 ? 'Kein Gold zum Bieten' : 'Nicht genug Gold'}
           </button>
         </div>
       )}
@@ -104,8 +104,8 @@ export default function BountyBoard({ players, selectedPlayerId, bounties = [], 
       {active.length === 0 && (
         <div className="no-select">
           {selectedPlayer
-            ? 'No active bounties. Post one to offer gold for a task!'
-            : 'Select a hero to post or claim bounties.'}
+            ? 'Keine aktiven Aufträge. Schreibe einen aus, um Gold für eine Aufgabe zu bieten!'
+            : 'Wähle einen Helden, um Aufträge auszuschreiben oder zu erfüllen.'}
         </div>
       )}
 
@@ -123,10 +123,10 @@ export default function BountyBoard({ players, selectedPlayerId, bounties = [], 
               <div className="bounty-card-info">
                 <div className="bounty-title">{bounty.title}</div>
                 <div className="bounty-meta">
-                  {creator && <span>from {creator.name}</span>}
+                  {creator && <span>von {creator.name}</span>}
                   {assignee
                     ? <span> → {assignee.name}</span>
-                    : <span className="bounty-meta-anyone"> → anyone</span>
+                    : <span className="bounty-meta-anyone"> → jeder</span>
                   }
                 </div>
               </div>
@@ -138,12 +138,12 @@ export default function BountyBoard({ players, selectedPlayerId, bounties = [], 
               <div className="bounty-card-actions">
                 {isCreator && (
                   <button className="bounty-cancel-btn" onClick={() => onCancelBounty(bounty.id)}>
-                    Cancel (+{bounty.gold}g back)
+                    Abbrechen (+{bounty.gold}g zurück)
                   </button>
                 )}
                 {canClaim && (
                   <button className="bounty-claim-btn" onClick={() => onClaimBounty(bounty.id)}>
-                    Complete! +{bounty.gold}g
+                    Erfüllen! +{bounty.gold}g
                   </button>
                 )}
               </div>
@@ -154,7 +154,7 @@ export default function BountyBoard({ players, selectedPlayerId, bounties = [], 
 
       {recent.length > 0 && (
         <>
-          <div className="section-label" style={{ marginTop: 16 }}>✓ Recently Completed</div>
+          <div className="section-label" style={{ marginTop: 16 }}>✓ Kürzlich erfüllt</div>
           {recent.map(bounty => {
             const completer = players.find(p => p.id === bounty.completedBy);
             const creator = players.find(p => p.id === bounty.createdBy);
@@ -164,9 +164,9 @@ export default function BountyBoard({ players, selectedPlayerId, bounties = [], 
                 <div className="bounty-card-info">
                   <div className="bounty-title">{bounty.title}</div>
                   <div className="bounty-meta">
-                    {completer?.name} completed — +{bounty.gold}g
+                    {completer?.name} hat erfüllt — +{bounty.gold}g
                     {creator && creator.id !== completer?.id && (
-                      <span className="bounty-meta-anyone"> (offered by {creator.name})</span>
+                      <span className="bounty-meta-anyone"> (ausgeschrieben von {creator.name})</span>
                     )}
                   </div>
                 </div>

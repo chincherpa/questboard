@@ -6,16 +6,16 @@ function formatTime(ts) {
   const now = Date.now();
   const diff = now - ts;
   const secs = Math.floor(diff / 1000);
-  if (secs < 60) return 'just now';
+  if (secs < 60) return 'gerade eben';
   const mins = Math.floor(secs / 60);
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 60) return `vor ${mins}m`;
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
+  if (hrs < 24) return `vor ${hrs}h`;
   const days = Math.floor(hrs / 24);
-  if (days < 7) return `${days}d ago`;
+  if (days < 7) return `vor ${days}T`;
   const d = new Date(ts);
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return `${months[d.getMonth()]} ${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  const months = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  return `${d.getDate()}. ${months[d.getMonth()]} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 
 const TYPE_TILE = {
@@ -41,13 +41,13 @@ export default function HistoryTab({ history, players, weeklyGold = {} }) {
 
   return (
     <>
-      <div className="section-label">Recent activity</div>
+      <div className="section-label">Letzte Aktivität</div>
       <div className="history-filters">
         <button
           className={`history-filter-btn${filter === null ? ' active' : ''}`}
           onClick={() => setFilter(null)}
         >
-          All
+          Alle
         </button>
         {(players ?? []).map(p => (
           <button
@@ -60,21 +60,21 @@ export default function HistoryTab({ history, players, weeklyGold = {} }) {
         ))}
       </div>
       {hist.length === 0 ? (
-        <div className="empty">No activity yet.</div>
+        <div className="empty">Noch keine Aktivität.</div>
       ) : (
         <div className="redeemed-list">
           {hist.map((h, i) => {
             const tile = TYPE_TILE[h.type] ?? 118;
             let action, pts;
             switch (h.type) {
-              case 'chore':           action = 'completed'; pts = `(+${h.pts} dmg${h.crit ? ' CRIT' : ''})`; break;
-              case 'penalty':         action = 'attacked by'; pts = `(-${h.pts} gold)`; break;
-              case 'badge':           action = 'earned'; pts = h.icon || '🏅'; break;
-              case 'loot':            action = 'found'; pts = h.pts ? `(+${h.pts} gold)` : (h.xp ? `(+${h.xp} XP)` : ''); break;
-              case 'bounty_post':     action = 'posted bounty'; pts = `(-${h.pts}g held)`; break;
-              case 'bounty_complete': action = 'completed bounty'; pts = `(+${h.pts}g)`; break;
-              case 'bounty_cancel':   action = 'canceled bounty'; pts = `(+${h.pts}g back)`; break;
-              default:                action = 'slew'; pts = h.pts != null ? `(+${h.pts} gold${h.lucky ? ' LUCKY' : ''})` : ''; break;
+              case 'chore':           action = 'erledigte'; pts = `(+${h.pts} Schaden${h.crit ? ' KRIT' : ''})`; break;
+              case 'penalty':         action = 'angegriffen von'; pts = `(-${h.pts} Gold)`; break;
+              case 'badge':           action = 'erhielt'; pts = h.icon || '🏅'; break;
+              case 'loot':            action = 'fand'; pts = h.pts ? `(+${h.pts} Gold)` : (h.xp ? `(+${h.xp} EP)` : ''); break;
+              case 'bounty_post':     action = 'schrieb Auftrag aus'; pts = `(-${h.pts}g gebunden)`; break;
+              case 'bounty_complete': action = 'erfüllte Auftrag'; pts = `(+${h.pts}g)`; break;
+              case 'bounty_cancel':   action = 'brach Auftrag ab'; pts = `(+${h.pts}g zurück)`; break;
+              default:                action = 'bezwang'; pts = h.pts != null ? `(+${h.pts} Gold${h.lucky ? ' GLÜCK' : ''})` : ''; break;
             }
             return (
               <div key={i} className="redeemed-item">
@@ -92,15 +92,15 @@ export default function HistoryTab({ history, players, weeklyGold = {} }) {
 
       {rewardHist.length > 0 && (
         <>
-          <div className="section-label" style={{ marginTop: 24 }}>Rewards redeemed</div>
+          <div className="section-label" style={{ marginTop: 24 }}>Eingelöste Belohnungen</div>
           <div className="redeemed-list">
             {rewardHist.map((h, i) => (
               <div key={i} className="redeemed-item">
                 <TileSprite tile={41} display={14} />
                 <span>
-                  <span className="redeemed-name">{h.player}</span> redeemed{' '}
+                  <span className="redeemed-name">{h.player}</span> löste ein{' '}
                   <span className="redeemed-name">{h.name}</span>{' '}
-                  (-{h.pts} gold)
+                  (-{h.pts} Gold)
                   {h.ts && <span className="history-ts">{formatTime(h.ts)}</span>}
                 </span>
               </div>
@@ -111,7 +111,7 @@ export default function HistoryTab({ history, players, weeklyGold = {} }) {
 
       {players && players.length > 0 && (
         <>
-          <div className="section-label" style={{ marginTop: 24 }}>Weekly leaderboard</div>
+          <div className="section-label" style={{ marginTop: 24 }}>Wochen-Rangliste</div>
           <div className="redeemed-list">
             {[...players]
               .sort((a, b) => (weeklyGold[b.id] || 0) - (weeklyGold[a.id] || 0))
@@ -120,7 +120,7 @@ export default function HistoryTab({ history, players, weeklyGold = {} }) {
                   <span style={{ fontSize: 14, minWidth: 20 }}>{['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣'][i]}</span>
                   <span>
                     <span className="redeemed-name">{p.name}</span>{' '}
-                    <span style={{ color: '#f5c870' }}>{weeklyGold[p.id] || 0} gold</span> this week
+                    <span style={{ color: '#f5c870' }}>{weeklyGold[p.id] || 0} Gold</span> diese Woche
                   </span>
                 </div>
               ))}
