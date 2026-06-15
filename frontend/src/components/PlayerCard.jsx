@@ -60,7 +60,7 @@ function BadgeTooltip({ badge }) {
   );
 }
 
-export default function PlayerCard({ player, gold, xp, isSelected, onClick, monsterDamage, lastHit, streak, monster, prestige, badges, selectedTitleBadge, onSelectTitle, onPrestige, activePowerUps = [], overkillCharge = 0, storedPowerTokens = 0, projectedOverkillRewardId = null }) {
+export default function PlayerCard({ player, gold, xp, isSelected, isActive, onSwitch, onClick, monsterDamage, lastHit, streak, monster, prestige, badges, selectedTitleBadge, onSelectTitle, onPrestige, activePowerUps = [], overkillCharge = 0, storedPowerTokens = 0, projectedOverkillRewardId = null }) {
   const tKey = todayKey();
   const { level: playerLevel } = getLevelFromXP(xp || 0);
   const m = resolveMonster(monster, player) || dateSeededMonster(player, tKey, playerLevel);
@@ -123,7 +123,8 @@ export default function PlayerCard({ player, gold, xp, isSelected, onClick, mons
   }, [lastHit]);
 
   return (
-    <div className={`player-card ${isSelected ? 'active' : ''}`} onClick={onClick} style={{ backgroundColor: hexToRgba(player.textColor, 0.07) }}>
+    <div className={`player-card ${isSelected ? 'active' : ''}${isActive ? ' player-active' : ''}`} onClick={onClick} style={{ backgroundColor: hexToRgba(player.textColor, 0.07) }}>
+      {isActive && <div className="active-badge">⚔ AKTIV</div>}
       <div className={`char-sprite${isSelected ? ' char-active' : ''}`}>
         <TileSprite tile={charCfg.tile} scale={4} />
       </div>
@@ -157,6 +158,13 @@ export default function PlayerCard({ player, gold, xp, isSelected, onClick, mons
           </div>
         )}
         <div className="player-class">{charCfg.label}</div>
+        {isSelected && !isActive && (
+          <button
+            className="switch-btn"
+            onClick={e => { e.stopPropagation(); onSwitch?.(player.id); }}
+            title="Mit PIN zu diesem Spieler wechseln"
+          >🔒 Switch</button>
+        )}
         <div className="player-pts">
           <span className={`gold-coin${coinFlipping ? ' flipping' : ''}`} />
           <span className="pixel-num">{gold}</span>

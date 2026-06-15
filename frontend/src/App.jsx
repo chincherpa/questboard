@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { ALL_CHORES, REWARDS, BADGES, MONSTER_TAUNTS, POWER_UPS, OVERKILL_CHARGE_GOAL, POWER_TOKEN_CAP, POWER_TOKEN_CHOICES } from './data';
+import { ALL_CHORES, REWARDS, BADGES, MONSTER_TAUNTS, POWER_UPS, CHORE_GOLD, OVERKILL_CHARGE_GOAL, POWER_TOKEN_CAP, POWER_TOKEN_CHOICES } from './data';
 import { todayKey, weekKey, monthKey, dateSeededMonster, getLevelFromXP, critChanceForLevel, luckForLevel, streakMultiplier, dailyBonusChoreId, rollLoot, checkNewBadges, getPlayerTitle, getTitleForBadge, isPowerUpActive, getActivePowerUps, cleanExpiredPowerUps, checkPowerUpTriggers, choreDoneKey, isChoreDoneForPlayer, initDungeonMap, dungeonMoveResult, generateFloor } from './logic';
 import PlayerCard from './components/PlayerCard';
 import ChoreGrid from './components/ChoreGrid';
@@ -12,6 +12,7 @@ import DungeonMap from './components/DungeonMap';
 import TileSprite from './components/TileSprite';
 import Celebration from './components/Celebration';
 import SetupWizard from './components/SetupWizard';
+import PinModal from './components/PinModal';
 import { playHit, playKill, playFanfare, playUndo, playRedeem, playCrit, playKeyPickup, isMuted, setMuted } from './sounds';
 
 const API = '/api';
@@ -177,6 +178,8 @@ export default function App() {
   const [needsSetup, setNeedsSetup] = useState(false);
   const [serverState, setServerState] = useState(null);
   const [selected, setSelected] = useState(null);
+  const [active, setActive] = useState(null);
+  const [pinTarget, setPinTarget] = useState(null);
   const [currentTab, setCurrentTab] = useState('chores');
   const [toast, setToast] = useState({ msg: '', visible: false });
   const [loading, setLoading] = useState(true);
@@ -299,8 +302,19 @@ export default function App() {
     setSelected(prev => prev === id ? null : id);
   }, []);
 
+  // Switch the active (acting) player — gated by a PIN prompt.
+  const requestSwitch = useCallback((id) => {
+    setPinTarget(id);
+  }, []);
+
+  const confirmSwitch = useCallback(() => {
+    setActive(pinTarget);
+    setSelected(pinTarget);
+    setPinTarget(null);
+  }, [pinTarget]);
+
   const claimChore = useCallback(async (choreId) => {
-    if (!selected || !serverState) return;
+    if (!selected || !active || !serverState) return;
     const chore = activeChores.find(c => c.id === choreId);
 
     // Optional confirmation to prevent accidental taps
@@ -353,6 +367,8 @@ export default function App() {
       const newState = {
         ...serverState,
         [storeKey]: { ...store, [doneKey]: selected },
+        gold: { ...serverState.gold, [selected]: (serverState.gold[selected] || 0) + CHORE_GOLD },
+        weeklyGold: { ...(serverState.weeklyGold || {}), [selected]: (serverState.weeklyGold?.[selected] || 0) + CHORE_GOLD },
         overkillCharge: { ...(serverState.overkillCharge || {}), [selected]: finalCharge },
         storedPowerTokens: { ...(serverState.storedPowerTokens || {}), [selected]: newTokens },
         history: [...(serverState.history || []), { type: 'chore', player: player.name, name: chore.name, pts: actualPts, overkill: true, ts: Date.now() }],
@@ -364,8 +380,8 @@ export default function App() {
       await updateState(newState);
       playHit(chore.pts);
       showToast(tokenEarned
-        ? `${player.name}: ⚡ OVERKILL! Power-Token gesichert!`
-        : `${player.name}: ⚡ Overkill! ${finalCharge}/${OVERKILL_CHARGE_GOAL} geladen`);
+        ? `${player.name}: ⚡ OVERKILL! Power-Token gesichert! +${CHORE_GOLD}g`
+        : `${player.name}: ⚡ Overkill! ${finalCharge}/${OVERKILL_CHARGE_GOAL} geladen +${CHORE_GOLD}g`);
       return;
     }
 
@@ -434,7 +450,7 @@ export default function App() {
       lucky_count:     isLucky    ? prog.lucky_count + 1     : prog.lucky_count,
     };
     const currentBadges = serverState.badges?.[selected] || [];
-    const newGoldTotal = (serverState.gold[selected] || 0) + totalGoldGain + lootGold + dungeonGoldBonus;
+    const newGoldTotal = (serverState.gold[selected] || 0) + CHORE_GOLD + totalGoldGain + lootGold + dungeonGoldBonus;
     const newBadgeIds = checkNewBadges(currentBadges, {
       streak: currentStreak,
       gold: newGoldTotal,
@@ -458,7 +474,7 @@ export default function App() {
       [storeKey]: { ...store, [doneKey]: selected },
       gold: { ...serverState.gold, [selected]: newGoldTotal },
       xp: newXpMap,
-      weeklyGold: { ...(serverState.weeklyGold || {}), [selected]: (serverState.weeklyGold?.[selected] || 0) + totalGoldGain + lootGold },
+      weeklyGold: { ...(serverState.weeklyGold || {}), [selected]: (serverState.weeklyGold?.[selected] || 0) + CHORE_GOLD + totalGoldGain + lootGold },
       badges: { ...(serverState.badges || {}), [selected]: [...currentBadges, ...newBadgeIds] },
       badgeProgress: { ...(serverState.badgeProgress || {}), [selected]: newProg },
       history: [...(serverState.history || []), ...historyEntries],
@@ -501,13 +517,13 @@ export default function App() {
     const dungeonTag = dungeonGoldBonus > 0 ? ` [☠ ${dungeonKillName} +${dungeonGoldBonus}g]` : dungeonFightMsg ? ` [${dungeonFightMsg}]` : '';
 
     const msg = justKilled
-      ? `${player.name} bezwang ${m.name}!${critTag} +${totalGoldGain}g${streakTag}${luckyTag}${lootTag}${levelTag}${badgeTag}${dungeonTag}`
-      : `${player.name} trifft für ${actualPts}!${critTag}${comboTag}${bonusTag} HP:${hp}/${m.maxHP}${lootTag}${dungeonTag}`;
+      ? `${player.name} bezwang ${m.name}!${critTag} +${totalGoldGain + CHORE_GOLD}g${streakTag}${luckyTag}${lootTag}${levelTag}${badgeTag}${dungeonTag}`
+      : `${player.name} trifft für ${actualPts}! +${CHORE_GOLD}g${critTag}${comboTag}${bonusTag} HP:${hp}/${m.maxHP}${lootTag}${dungeonTag}`;
     showToast(msg);
-  }, [selected, serverState, players, activeChores, bonusChoreId, updateState, showToast]);
+  }, [selected, active, serverState, players, activeChores, bonusChoreId, updateState, showToast]);
 
   const unclaimChore = useCallback(async (choreId) => {
-    if (!selected || !serverState) return;
+    if (!selected || !active || !serverState) return;
     const chore = activeChores.find(c => c.id === choreId);
     const storeKey = chore.freq === 'daily' ? 'dailyDone' : chore.freq === 'weekly' ? 'weeklyDone' : 'monthlyDone';
     const store = serverState[storeKey];
@@ -538,6 +554,7 @@ export default function App() {
       const newState = {
         ...serverState,
         [storeKey]: updatedStore,
+        gold: { ...serverState.gold, [selected]: Math.max(0, (serverState.gold[selected] || 0) - CHORE_GOLD) },
         overkillCharge: { ...(serverState.overkillCharge || {}), [selected]: Math.max(0, prevCharge - 1) },
         damageLog: newDamageLog,
       };
@@ -556,9 +573,7 @@ export default function App() {
     const newState = {
       ...serverState,
       [storeKey]: updatedStore,
-      gold: wasKillShot
-        ? { ...serverState.gold, [selected]: Math.max(0, (serverState.gold[selected] || 0) - m.gold) }
-        : serverState.gold,
+      gold: { ...serverState.gold, [selected]: Math.max(0, (serverState.gold[selected] || 0) - CHORE_GOLD - (wasKillShot ? m.gold : 0)) },
       monsterDamage: {
         ...serverState.monsterDamage,
         [selected]: { ...(serverState.monsterDamage?.[selected] || {}), [tKey]: newDmg },
@@ -569,10 +584,10 @@ export default function App() {
     await updateState(newState);
     playUndo();
     showToast(`${player.name} hat rückgängig gemacht: ${chore.name}`);
-  }, [selected, serverState, players, activeChores, updateState, showToast]);
+  }, [selected, active, serverState, players, activeChores, updateState, showToast]);
 
   const redeemReward = useCallback(async (rewardId) => {
-    if (!selected || !serverState) return;
+    if (!selected || !active || !serverState) return;
     const reward = activeRewards.find(r => r.id === rewardId);
     const player = players.find(p => p.id === selected);
     const gold = serverState.gold[selected] || 0;
@@ -603,10 +618,10 @@ export default function App() {
     playRedeem();
     const badgeTag = newBadgeIds.length ? ` 🏅 ${BADGES.find(b => b.id === newBadgeIds[0])?.name}!` : '';
     showToast(`${player.name} hat eingelöst: ${reward.name}!${badgeTag}`);
-  }, [selected, serverState, players, activeRewards, updateState, showToast]);
+  }, [selected, active, serverState, players, activeRewards, updateState, showToast]);
 
   const handlePrestige = useCallback(async (playerId) => {
-    if (!serverState) return;
+    if (!serverState || !active) return;
     const player = players.find(p => p.id === playerId);
     const xp = serverState.xp?.[playerId] || 0;
     const { level } = getLevelFromXP(xp);
@@ -624,7 +639,7 @@ export default function App() {
     };
     await updateState(newState);
     showToast(`${player.name} hat Prestige gemacht! +${currentPrestige * 5}% Goldbonus für immer! ⭐`);
-  }, [serverState, players, updateState, showToast]);
+  }, [active, serverState, players, updateState, showToast]);
 
   const handleSelectTitle = useCallback(async (playerId, badgeId) => {
     if (!serverState) return;
@@ -636,7 +651,7 @@ export default function App() {
   }, [serverState, updateState]);
 
   const createBounty = useCallback(async (title, icon, gold, assignedTo) => {
-    if (!selected || !serverState) return;
+    if (!selected || !active || !serverState) return;
     const player = players.find(p => p.id === selected);
     const playerGold = serverState.gold[selected] || 0;
     if (playerGold < gold) return;
@@ -659,10 +674,10 @@ export default function App() {
     };
     await updateState(newState);
     showToast(`${player.name} hat ausgeschrieben: ${title} (${gold}g geboten)`);
-  }, [selected, serverState, players, updateState, showToast]);
+  }, [selected, active, serverState, players, updateState, showToast]);
 
   const claimBounty = useCallback(async (bountyId) => {
-    if (!selected || !serverState) return;
+    if (!selected || !active || !serverState) return;
     const bounty = (serverState.bounties || []).find(b => b.id === bountyId);
     if (!bounty || bounty.completedAt) return;
     const player = players.find(p => p.id === selected);
@@ -677,10 +692,10 @@ export default function App() {
     await updateState(newState);
     playRedeem();
     showToast(`${player.name} hat Auftrag erfüllt: ${bounty.title}! +${bounty.gold}g`);
-  }, [selected, serverState, players, updateState, showToast]);
+  }, [selected, active, serverState, players, updateState, showToast]);
 
   const cancelBounty = useCallback(async (bountyId) => {
-    if (!selected || !serverState) return;
+    if (!selected || !active || !serverState) return;
     const bounty = (serverState.bounties || []).find(b => b.id === bountyId);
     if (!bounty || bounty.createdBy !== selected || bounty.completedAt) return;
     const player = players.find(p => p.id === selected);
@@ -692,10 +707,10 @@ export default function App() {
     };
     await updateState(newState);
     showToast(`${player.name} hat abgebrochen: ${bounty.title} (+${bounty.gold}g zurück)`);
-  }, [selected, serverState, players, updateState, showToast]);
+  }, [selected, active, serverState, players, updateState, showToast]);
 
   const handleDungeonMove = useCallback(async (playerId, dx, dy) => {
-    if (!serverState) return;
+    if (!serverState || !active) return;
     const player = players.find(p => p.id === playerId);
     const dungeonMap = serverState.dungeonMaps?.[playerId];
     if (!dungeonMap) return;
@@ -717,7 +732,7 @@ export default function App() {
       if (event.kind === 'key') playKeyPickup();
     }
     await updateState(newState);
-  }, [serverState, players, updateState, showToast]);
+  }, [active, serverState, players, updateState, showToast]);
 
   const resetWeek = useCallback(async () => {
     if (!confirm('Aufgaben, Gold und Monster zurücksetzen? Der Verlauf bleibt erhalten.')) return;
@@ -902,6 +917,11 @@ export default function App() {
 
   const state = serverState;
   const selectedPlayer = players.find(p => p.id === selected);
+  // View-only until an operator authenticates with a PIN. The active operator
+  // may then complete chores for whichever hero is selected (credited to that
+  // selected hero).
+  const boardReadOnly = active == null;
+  const pinTargetPlayer = pinTarget != null ? players.find(p => p.id === pinTarget) : null;
 
   return (
     <>
@@ -942,6 +962,8 @@ export default function App() {
             gold={state.gold[p.id] || 0}
             xp={state.xp?.[p.id] || 0}
             isSelected={selected === p.id}
+            isActive={active === p.id}
+            onSwitch={requestSwitch}
             onClick={() => selectPlayer(p.id)}
             monsterDamage={state.monsterDamage}
             lastHit={lastHits[p.id]}
@@ -972,6 +994,7 @@ export default function App() {
                 onClaimChore={claimChore}
                 onUnclaimChore={unclaimChore}
                 bonusChoreId={bonusChoreId}
+                readOnly={boardReadOnly}
               />
             : <div className="no-select">Wähle oben einen Helden, um seine Quests zu sehen.</div>
         )}
@@ -982,6 +1005,7 @@ export default function App() {
                 gold={state.gold[selected] || 0}
                 activeRewards={activeRewards}
                 onRedeemReward={redeemReward}
+                readOnly={boardReadOnly}
               />
             : <div className="no-select">Wähle oben einen Helden, um den Shop zu durchstöbern.</div>
         )}
@@ -994,6 +1018,7 @@ export default function App() {
                 allDungeonMaps={state.dungeonMaps}
                 onMove={(dx, dy) => handleDungeonMove(selected, dx, dy)}
                 cellSize={44}
+                readOnly={boardReadOnly}
               />
             : <div className="no-select">Wähle oben einen Helden, um das Verlies zu erkunden.</div>
         )}
@@ -1017,6 +1042,13 @@ export default function App() {
     </div>
     <div className="version-label">v{__APP_VERSION__}</div>
     {celebration && <Celebration onDismiss={() => setCelebration(false)} />}
+    {pinTargetPlayer && (
+      <PinModal
+        targetPlayer={pinTargetPlayer}
+        onSuccess={confirmSwitch}
+        onCancel={() => setPinTarget(null)}
+      />
+    )}
     </>
   );
 }

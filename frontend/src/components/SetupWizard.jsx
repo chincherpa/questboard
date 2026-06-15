@@ -52,7 +52,13 @@ function makeNewPlayer(existingPlayers = []) {
     class: CLASSES[n % CLASSES.length].id,
     color: PLAYER_COLORS[colorIdx].color,
     textColor: PLAYER_COLORS[colorIdx].textColor,
+    pin: '0000',
   };
+}
+
+// Sanitize a PIN input value to up to 4 digits.
+function sanitizePin(v) {
+  return (v || '').replace(/\D/g, '').slice(0, 4);
 }
 
 const S = {
@@ -210,6 +216,20 @@ function PlayerForm({ player, onChange }) {
             />
           ))}
         </div>
+      </div>
+
+      <div style={{ marginBottom: 16 }}>
+        <label style={S.label}>PIN (4 Ziffern)</label>
+        <input
+          style={{ ...S.input, letterSpacing: '0.4em', width: 110 }}
+          type="text"
+          inputMode="numeric"
+          maxLength={4}
+          placeholder="0000"
+          value={player.pin ?? '0000'}
+          onChange={e => onChange('pin', sanitizePin(e.target.value))}
+        />
+        <div style={{ color: '#7a7060', fontSize: 10, marginTop: 4 }}>Schützt den Spielerwechsel. Standard: 0000.</div>
       </div>
     </div>
   );
@@ -709,6 +729,19 @@ function TabParty({ players, onUpdatePlayer, onAddPlayer, onRemovePlayer }) {
                     ))}
                   </div>
                 </div>
+                <div style={{ marginTop: 12 }}>
+                  <label style={S.label}>PIN (4 Ziffern)</label>
+                  <input
+                    style={{ ...S.input, letterSpacing: '0.4em', width: 110, padding: '6px 8px', fontSize: 13 }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={4}
+                    placeholder="0000"
+                    value={p.pin ?? '0000'}
+                    onChange={e => onUpdatePlayer(i, 'pin', sanitizePin(e.target.value))}
+                  />
+                  <div style={{ color: '#7a7060', fontSize: 10, marginTop: 4 }}>Schützt den Spielerwechsel. Standard: 0000.</div>
+                </div>
               </div>
             )}
           </div>
@@ -965,7 +998,7 @@ export default function SetupWizard({ onComplete, onCancel, initialConfig }) {
   async function handleLaunch() {
     setLaunching(true);
     await onComplete({
-      players,
+      players: players.map(p => ({ ...p, pin: /^\d{4}$/.test(p.pin ?? '') ? p.pin : '0000' })),
       enabledChores: [...enabledChores],
       choreOverrides,
       customChores,

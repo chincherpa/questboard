@@ -996,6 +996,149 @@ body.crt::after {
   letter-spacing: 0.03em;
 }
 
+/* ── Active player marker ── */
+.player-card.player-active {
+  border: 3px solid #6fdc6f;
+  box-shadow: 0 0 22px rgba(111,220,111,0.45), 0 0 6px rgba(111,220,111,0.35), inset 0 0 24px rgba(60,180,60,0.08);
+  margin: -2px;
+}
+.active-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-family: 'PixelatedElegance', monospace;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  color: #0e1117;
+  background: #6fdc6f;
+  padding: 2px 7px;
+  border-bottom-left-radius: var(--radius-sm);
+  z-index: 2;
+}
+
+/* ── PIN switch ── */
+.switch-btn {
+  font-family: 'PixelatedElegance', monospace;
+  font-size: 8px;
+  background: linear-gradient(135deg, #1a2a4a, #2a3a6a);
+  border: 1px solid var(--gold-border);
+  color: var(--gold2);
+  padding: 3px 8px;
+  cursor: pointer;
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+  border-radius: var(--radius-sm);
+}
+.switch-btn:hover {
+  border-color: var(--gold2);
+  box-shadow: 0 0 8px rgba(232,184,75,0.35);
+}
+
+.pin-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+.pin-box {
+  background: var(--bg2);
+  background-image: var(--stone);
+  border: 2px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  animation: celebration-in 0.25s ease forwards;
+}
+
+.pin-title {
+  font-family: 'Cinzel', serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gold2);
+  text-shadow: 0 0 16px rgba(232,184,75,0.5);
+  margin-bottom: 4px;
+}
+
+.pin-subtitle {
+  font-family: var(--pixel);
+  font-size: 10px;
+  color: var(--text2);
+  margin-bottom: 18px;
+}
+
+.pin-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.pin-digit {
+  width: 42px;
+  height: 52px;
+  text-align: center;
+  font-family: var(--pixel);
+  font-size: 22px;
+  color: var(--gold2);
+  background: var(--bg);
+  border: 2px solid var(--gold-border);
+  border-radius: var(--radius-sm);
+  caret-color: var(--gold2);
+}
+.pin-digit:focus {
+  outline: none;
+  border-color: var(--gold2);
+  box-shadow: 0 0 8px rgba(232,184,75,0.4);
+}
+.pin-digit.error {
+  border-color: #c05a5a;
+  box-shadow: 0 0 8px rgba(192,90,90,0.5);
+}
+
+.pin-error {
+  font-family: var(--pixel);
+  font-size: 10px;
+  color: #e07a7a;
+  margin-bottom: 14px;
+}
+
+.pin-cancel {
+  font-family: var(--pixel);
+  font-size: 10px;
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  padding: 6px 16px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+.pin-cancel:hover { color: var(--gold2); border-color: var(--gold-border); }
+
+.readonly-banner {
+  font-family: var(--pixel);
+  font-size: 10px;
+  color: var(--gold2);
+  background: rgba(232,184,75,0.08);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.chore-sections.read-only .chore,
+.rewards.read-only .reward {
+  opacity: 0.6;
+  cursor: default;
+  filter: grayscale(0.3);
+}
+
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }

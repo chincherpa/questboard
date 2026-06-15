@@ -28,6 +28,7 @@ export const ALL_CHORES = [
   // Weekly - everyone
   { id: 'water',       name: 'Pflanzen gießen',        icon: '🌱', pts: 2, who: 'all',    freq: 'weekly',  mode: 'party' },
 
+
   // Weekly - adults
   { id: 'vacuum',      name: 'Staubsaugen',            icon: '🌀', pts: 4, who: 'adults', freq: 'weekly',  mode: 'party' },
   { id: 'mop',         name: 'Boden wischen',          icon: '🪣', pts: 4, who: 'adults', freq: 'weekly',  mode: 'party' },
@@ -233,6 +234,9 @@ export const POWER_UPS = [
   { id: 'double_damage',   name: 'Doppelschaden',    icon: 'double_damage',   desc: '2x Aufgaben-Schaden an Monstern',    effectType: 'timed'   },
   { id: 'treasure_magnet', name: 'Schatzmagnet',     icon: 'treasure_magnet', desc: '3x Beute- und Glücks-Chance',        effectType: 'timed'   },
 ];
+
+// Flat gold awarded for completing any chore (independent of monster kill)
+export const CHORE_GOLD = 1;
 
 export const OVERKILL_CHARGE_GOAL = 4;
 export const POWER_TOKEN_CAP = 2;

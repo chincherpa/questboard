@@ -11,7 +11,7 @@ function dmgClass(p) {
   return 'pts-6';
 }
 
-function ChoreCard({ chore, players, dailyDone, weeklyDone, monthlyDone, selectedPlayerId, onClaim, onUnclaim, bonusChoreId }) {
+function ChoreCard({ chore, players, dailyDone, weeklyDone, monthlyDone, selectedPlayerId, onClaim, onUnclaim, bonusChoreId, readOnly }) {
   const store = chore.freq === 'daily' ? dailyDone : chore.freq === 'weekly' ? weeklyDone : monthlyDone;
   const isDone = isChoreDoneForPlayer(store, chore, selectedPlayerId);
   const claimedById = getChoreClaimant(store, chore, selectedPlayerId);
@@ -19,6 +19,7 @@ function ChoreCard({ chore, players, dailyDone, weeklyDone, monthlyDone, selecte
   const canUndo = isDone && claimedById === selectedPlayerId;
 
   function handleClick() {
+    if (readOnly) return;
     if (isDone) {
       if (canUndo) onUnclaim(chore.id);
     } else {
@@ -42,13 +43,13 @@ function ChoreCard({ chore, players, dailyDone, weeklyDone, monthlyDone, selecte
       </div>
       <div className="chore-name">{chore.name}{chore.mode === 'solo' && <span className="solo-badge">1P</span>}</div>
       {isDone && (
-        <div className="done-by">{canUndo ? '↩ zurück' : `✔ ${dp ? dp.name : 'erledigt'}`}</div>
+        <div className="done-by">{canUndo ? '↩ undo' : `✔ ${dp ? dp.name : 'erledigt'}`}</div>
       )}
     </div>
   );
 }
 
-export default function ChoreGrid({ player, players, activeChores, dailyDone, weeklyDone, monthlyDone, onClaimChore, onUnclaimChore, bonusChoreId }) {
+export default function ChoreGrid({ player, players, activeChores, dailyDone, weeklyDone, monthlyDone, onClaimChore, onUnclaimChore, bonusChoreId, readOnly }) {
   const chores = getChoresFor(player, activeChores);
   const byName  = (a, b) => a.name.localeCompare(b.name);
   const daily   = chores.filter(c => c.freq === 'daily').sort(byName);
@@ -64,10 +65,14 @@ export default function ChoreGrid({ player, players, activeChores, dailyDone, we
     onClaim: onClaimChore,
     onUnclaim: onUnclaimChore,
     bonusChoreId,
+    readOnly,
   };
 
   return (
-    <div className="chore-sections">
+    <div className={`chore-sections${readOnly ? ' read-only' : ''}`}>
+      {readOnly && (
+        <div className="readonly-banner">👁 Nur Ansicht — tippe „🔒 Switch" bei einem Helden und gib den PIN ein, um Aufgaben abzuhaken.</div>
+      )}
       <div>
         <div className="section-label">
           <TileSprite tile={118} display={12} />

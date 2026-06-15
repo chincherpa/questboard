@@ -13,24 +13,32 @@ shows that hero's board. NEW: when the selected hero is not the active player, a
 Correct PIN makes that hero the active player; wrong PIN shows a message and
 lets the user try again.
 
-## Active vs. selected
+## Active (operator) vs. selected (target)
 
-Two distinct states:
+Two distinct roles:
 
-- **`selected`** (existing): the card the user clicked. Its board is displayed.
-  Clicking toggles selection. **No PIN.** Unchanged from today.
-- **`active`** (new): the player permitted to perform actions — claim chores,
-  redeem rewards, use power-ups, prestige, dungeon moves. Runtime state in
-  `App.jsx`, default `null`, held in memory only (resets on page reload; a
-  reload requires re-entering a PIN to act, which is acceptable for a kiosk).
+- **`selected`** (existing): the card the user clicked. Its board is displayed
+  and is the **target** of any action — completed chores, redeemed rewards, etc.
+  are credited to the selected hero. Clicking toggles selection. **No PIN.**
+- **`active`** (new): the **operator** — the PIN-authenticated person currently
+  driving the board (e.g. a parent). Runtime state in `App.jsx`, default `null`,
+  held in memory only (resets on page reload).
 
-A selected hero who is **not** active is **view-only**: their board renders, but
-all action controls are disabled. You can only act when `selected === active`.
-Because the switch sets `active` to the currently-selected hero, after a
-successful switch `selected === active` and the board becomes interactive.
+Once an operator is active, they may act on **any** selected hero's board, and
+the action is credited to that **selected** hero. Example: parent authenticates
+(active), selects a child (selected), and ticks the child's chores — the chore,
+gold, and damage all go to the child.
 
-Switching only gates *changing* who is active. Re-selecting the already-active
-hero (e.g. after viewing someone else) needs no PIN.
+Gating:
+
+- **No operator active (`active == null`)** → all boards are view-only. To act,
+  authenticate via the Switch button + PIN on any hero.
+- **Operator active** → the selected hero's board is interactive; actions credit
+  the selected hero (which may be the operator themselves or any other hero).
+
+The action handlers already credit `selected` (chore keys, gold, monster damage
+are all keyed by `selected`), so only the gate changes — from `selected ===
+active` to "an operator is active" (`active != null`).
 
 ## Data model
 
@@ -88,23 +96,24 @@ Modal contents and behavior:
 - When the 4th digit is entered, auto-submit (verify immediately). A submit
   button is also acceptable as a fallback.
 - Compare entered value against `targetPlayer.pin ?? "0000"`.
-  - **Match** → `setActive(pinTarget)`, then close modal (`setPinTarget(null)`).
-    Since `pinTarget` is the selected card, `selected === active` afterward and
-    the board becomes interactive.
+  - **Match** → `setActive(pinTarget)` (and select that hero), then close modal
+    (`setPinTarget(null)`). An operator is now active, so boards become
+    interactive and actions credit whichever hero is selected.
   - **Mismatch** → show error message ("Falscher PIN"), clear all boxes,
     refocus the first box, allow retry.
 - Cancel via a close button or backdrop click → close modal, no switch.
 
 ## Read-only gating
 
-When `selected !== active`, the selected hero's board is view-only:
+When no operator is active (`active == null`), boards are view-only:
 
-- Pass a `readOnly` (or `canAct`) prop to `ChoreGrid`, `RewardGrid`, and the
-  dungeon view so claim / redeem / move / power-up / prestige controls are
-  disabled or hidden.
+- Pass a `readOnly` prop to `ChoreGrid`, `RewardGrid`, and the dungeon view so
+  claim / redeem / move controls are disabled, with a banner prompting the user
+  to authenticate via Switch + PIN.
 - Action handlers in `App.jsx` (`claimChore`, `unclaimChore`, `redeemReward`,
-  power-up activation, `handlePrestige`, dungeon moves) early-return unless
-  `selected === active`, as a defense in case a disabled control is bypassed.
+  bounty create/claim/cancel, `handlePrestige`, dungeon moves) early-return
+  unless an operator is active, as a defense in case a disabled control is
+  bypassed. They continue to credit the `selected` hero.
 
 ## Error handling
 

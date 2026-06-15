@@ -244,12 +244,12 @@ function currentTileDesc(tileType, dungeonMap) {
   }
 }
 
-export default function DungeonMap({ player, dungeonMap, allPlayers = [], allDungeonMaps = {}, onMove, cellSize = CELL }) {
+export default function DungeonMap({ player, dungeonMap, allPlayers = [], allDungeonMaps = {}, onMove, cellSize = CELL, readOnly = false }) {
   if (!dungeonMap?.grid || !player) return null;
   const { grid, pos, explored, pendingMoves, activeMonster, floor = 1 } = dungeonMap;
   const [px, py] = pos;
   const inCombat = activeMonster && (activeMonster.currentHP ?? 0) > 0;
-  const canMove = pendingMoves > 0 && !inCombat;
+  const canMove = pendingMoves > 0 && !inCombat && !readOnly;
 
   // Other players' positions indexed by coord key
   const otherPlayerAt = {};
