@@ -13,7 +13,7 @@ import TileSprite from './components/TileSprite';
 import Celebration from './components/Celebration';
 import SetupWizard from './components/SetupWizard';
 import PinModal from './components/PinModal';
-import { playHit, playKill, playFanfare, playUndo, playRedeem, playCrit, playKeyPickup, isMuted, setMuted } from './sounds';
+import { playHit, playKill, playFanfare, playUndo, playRedeem, playCrit, playKeyPickup, isMuted, setMuted, isMusicOn, startMusic, stopMusic } from './sounds';
 
 const API = '/api';
 
@@ -187,6 +187,7 @@ export default function App() {
   const [celebration, setCelebration] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [muted, setMutedState] = useState(isMuted());
+  const [musicOn, setMusicOnState] = useState(isMusicOn());
   const lastActionAt = useRef(0);
   const lastChoreAt = useRef(0);
   const comboRef = useRef(0);
@@ -948,6 +949,7 @@ export default function App() {
           </button>
         </div>
         <button className="mute-btn" onClick={() => { const next = !muted; setMuted(next); setMutedState(next); }} title={muted ? 'T\u00f6ne anschalten' : 'T\u00f6ne stummschalten'}>{muted ? '\ud83d\udd07' : '\ud83d\udd0a'}</button>
+        <button className="mute-btn" onClick={() => { const next = !musicOn; if (next) startMusic(); else stopMusic(); setMusicOnState(next); }} title={musicOn ? 'Musik ausschalten' : 'Musik anschalten'}>{musicOn ? '\ud83c\udfb5' : '\ud83c\udfb6'}</button>
         <button className="reset-btn" onClick={() => setShowSettings(true)}><TileSprite tile={115} display={12} /> Einstellungen</button>
         <button className="reset-btn" onClick={resetWeek}><TileSprite tile={115} display={12} /> Woche zur\u00fccksetzen</button>
         <button className="reset-btn" onClick={exportSave}><TileSprite tile={115} display={12} /> Spielstand exportieren</button>
@@ -983,20 +985,18 @@ export default function App() {
 
       <div>
         {currentTab === 'chores' && (
-          selected && selectedPlayer
-            ? <ChoreGrid
-                player={selectedPlayer}
-                players={players}
-                activeChores={activeChores}
-                dailyDone={state.dailyDone}
-                weeklyDone={state.weeklyDone}
-                monthlyDone={state.monthlyDone || {}}
-                onClaimChore={claimChore}
-                onUnclaimChore={unclaimChore}
-                bonusChoreId={bonusChoreId}
-                readOnly={boardReadOnly}
-              />
-            : <div className="no-select">Wähle oben einen Helden, um seine Quests zu sehen.</div>
+          <ChoreGrid
+            player={selectedPlayer || null}
+            players={players}
+            activeChores={activeChores}
+            dailyDone={state.dailyDone}
+            weeklyDone={state.weeklyDone}
+            monthlyDone={state.monthlyDone || {}}
+            onClaimChore={claimChore}
+            onUnclaimChore={unclaimChore}
+            bonusChoreId={bonusChoreId}
+            readOnly={boardReadOnly || !selectedPlayer}
+          />
         )}
         {currentTab === 'rewards' && (
           selected && selectedPlayer

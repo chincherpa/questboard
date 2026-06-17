@@ -248,9 +248,8 @@ export function dateSeededMonster(player, dateKey, playerLevel = 1) {
 // chores: the active chore list (already filtered by enabledChores + customChores)
 export function getChoresFor(player, chores) {
   const dow = todayDow();
-  const isKid = player.mode === 'kids';
+  // All players see all quests — no kids/adults split for quest display.
   return chores
-    .filter(c => c.who === 'all' || (isKid ? c.who === 'kids' : c.who === 'adults'))
     .filter(c => c.dow === undefined || c.dow === dow);
 }
 

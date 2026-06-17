@@ -58,7 +58,7 @@ export default function ChoreGrid({ player, players, activeChores, dailyDone, we
 
   const cardProps = {
     players,
-    selectedPlayerId: player.id,
+    selectedPlayerId: player?.id,
     dailyDone,
     weeklyDone,
     monthlyDone: monthlyDone || {},

@@ -78,3 +78,79 @@ export function playKeyPickup() {
   beep(1320, 0.14, 'sine', 0.18);
   setTimeout(() => beep(1760, 0.20, 'sine', 0.15), 120);
 }
+
+// --- Background music: synthesized looping chiptune ------------------------
+// Independent of the SFX `muted` flag above. Off by default.
+let musicOn = JSON.parse(localStorage.getItem('questboard_music') || 'false');
+let musicGain = null;       // shared low-volume bus so SFX sit on top
+let schedulerId = null;     // setInterval handle for the lookahead scheduler
+let nextNoteTime = 0;       // ctx time the next step should play
+let step = 0;               // current index into the pattern
+
+const STEP_DUR = 0.16;      // seconds per 16th step (~94 BPM feel)
+const LOOKAHEAD = 0.1;      // schedule notes this far ahead (s)
+const TICK = 25;            // scheduler poll interval (ms)
+
+// 16-step loop over an Am - F - C - G progression. `m` = melody (square),
+// `b` = bass (triangle). null = rest. Frequencies in Hz.
+const MELODY = [440, 523, 659, 523, 349, 440, 523, 440, 523, 659, 784, 659, 392, 494, 587, 494];
+const BASS   = [110, null, null, null, 87, null, null, null, 131, null, null, null, 98, null, null, null];
+
+// Schedule one oscillator note onto the music bus.
+function musicNote(freq, time, dur, type, vol) {
+  const c = getCtx();
+  const osc = c.createOscillator();
+  const g = c.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, time);
+  g.gain.setValueAtTime(vol, time);
+  g.gain.exponentialRampToValueAtTime(0.001, time + dur);
+  osc.connect(g);
+  g.connect(musicGain);
+  osc.start(time);
+  osc.stop(time + dur);
+}
+
+// Lookahead loop: schedule any steps that fall within the next LOOKAHEAD window.
+function scheduler() {
+  const c = getCtx();
+  while (nextNoteTime < c.currentTime + LOOKAHEAD) {
+    const m = MELODY[step % MELODY.length];
+    const b = BASS[step % BASS.length];
+    if (m) musicNote(m, nextNoteTime, STEP_DUR * 0.9, 'square', 0.10);
+    if (b) musicNote(b, nextNoteTime, STEP_DUR * 3.6, 'triangle', 0.12);
+    nextNoteTime += STEP_DUR;
+    step += 1;
+  }
+}
+
+export function isMusicOn() {
+  return musicOn;
+}
+
+export function startMusic() {
+  musicOn = true;
+  localStorage.setItem('questboard_music', 'true');
+  try {
+    const c = getCtx();
+    if (c.state === 'suspended') c.resume();      // satisfy autoplay policy
+    if (!musicGain) {
+      musicGain = c.createGain();
+      musicGain.gain.value = 1;
+      musicGain.connect(c.destination);
+    }
+    if (schedulerId) return;                       // already running
+    step = 0;
+    nextNoteTime = c.currentTime + 0.05;
+    schedulerId = setInterval(scheduler, TICK);
+  } catch (_) {}
+}
+
+export function stopMusic() {
+  musicOn = false;
+  localStorage.setItem('questboard_music', 'false');
+  if (schedulerId) {
+    clearInterval(schedulerId);
+    schedulerId = null;
+  }
+}

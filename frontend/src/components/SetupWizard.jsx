@@ -941,6 +941,7 @@ export default function SetupWizard({ onComplete, onCancel, initialConfig }) {
     initialConfig?.powerUpSettings ?? { ...DEFAULT_POWER_UP_SETTINGS }
   );
   const [launching, setLaunching] = useState(false);
+  const [launchError, setLaunchError] = useState(null);
 
   function handlePlayerCount(n) {
     setPlayers(prev => {
@@ -996,23 +997,32 @@ export default function SetupWizard({ onComplete, onCancel, initialConfig }) {
   }
 
   async function handleLaunch() {
+    setLaunchError(null);
     setLaunching(true);
-    await onComplete({
-      players: players.map(p => ({ ...p, pin: /^\d{4}$/.test(p.pin ?? '') ? p.pin : '0000' })),
-      enabledChores: [...enabledChores],
-      choreOverrides,
-      customChores,
-      enabledRewards: [...enabledRewards],
-      rewardOverrides,
-      customRewards,
-      crtEnabled,
-      uiScale,
-      animatedBg,
-      weekStartDay,
-      confirmChores,
-      powerUpSettings,
-      displayOrientation,
-    });
+    try {
+      await onComplete({
+        players: players.map(p => ({ ...p, pin: /^\d{4}$/.test(p.pin ?? '') ? p.pin : '0000' })),
+        enabledChores: [...enabledChores],
+        choreOverrides,
+        customChores,
+        enabledRewards: [...enabledRewards],
+        rewardOverrides,
+        customRewards,
+        crtEnabled,
+        uiScale,
+        animatedBg,
+        weekStartDay,
+        confirmChores,
+        powerUpSettings,
+        displayOrientation,
+      });
+      // On success onComplete unmounts this wizard; nothing more to do.
+    } catch (err) {
+      // Save failed (e.g. backend restarting). Recover instead of hanging
+      // forever on the "preparing…" screen — let the user retry.
+      setLaunching(false);
+      setLaunchError('Speichern fehlgeschlagen. Server erreichbar? Erneut versuchen.');
+    }
   }
 
   const currentCount = players.length || (initialConfig?.players?.length ?? 2);
@@ -1046,6 +1056,11 @@ export default function SetupWizard({ onComplete, onCancel, initialConfig }) {
             ))}
           </div>
           <div style={S.body}>
+            {launchError && !launching && (
+              <div style={{ margin: '0 0 12px', padding: '8px 12px', background: '#3a1a1a', border: '1px solid #6a2a2a', color: '#f5a0a0', fontSize: 12, textAlign: 'center' }}>
+                ⚠ {launchError}
+              </div>
+            )}
             {launching ? (
               <div style={{ textAlign: 'center', padding: '40px 0', color: '#c8d0e0' }}>Änderungen werden gespeichert…</div>
             ) : activeTab === 'party' ? (
@@ -1112,6 +1127,11 @@ export default function SetupWizard({ onComplete, onCancel, initialConfig }) {
         )}
 
         <div style={S.body}>
+          {launchError && !launching && (
+            <div style={{ margin: '0 0 12px', padding: '8px 12px', background: '#3a1a1a', border: '1px solid #6a2a2a', color: '#f5a0a0', fontSize: 12, textAlign: 'center' }}>
+              ⚠ {launchError}
+            </div>
+          )}
           {launching ? (
             <div style={{ textAlign: 'center', padding: '40px 0', color: '#c8d0e0' }}>
               Dein Abenteuer wird vorbereitet…
