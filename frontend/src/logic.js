@@ -216,6 +216,28 @@ export function monthKey() {
   return `${d.getFullYear()}-${d.getMonth()}`;
 }
 
+// Period keys look like "Y-M-D" / "Y-M" (month 0-based). Compare numerically so
+// a client whose clock is behind (other timezone, drifting kiosk clock, stale
+// tab) never "resets" the stored state back to an older period.
+export function keyIsBefore(stored, current) {
+  const parse = k => String(k || '').split('-').map(Number);
+  const a = parse(stored), b = parse(current);
+  if (!stored || a.some(Number.isNaN)) return true;
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    const x = a[i] ?? 0, y = b[i] ?? 0;
+    if (x !== y) return x < y;
+  }
+  return false;
+}
+
+// True if the stored state belongs to an earlier day/week/month than now.
+export function isStateStale(state, weekStartDay = 1) {
+  if (!state) return false;
+  return keyIsBefore(state.todayKey, todayKey())
+    || keyIsBefore(state.weekKey, weekKey(weekStartDay))
+    || keyIsBefore(state.monthKey, monthKey());
+}
+
 export function todayDow() {
   return new Date().getDay();
 }
