@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { ALL_CHORES, REWARDS, BADGES, MONSTER_TAUNTS, POWER_UPS, CHORE_GOLD, OVERKILL_CHARGE_GOAL, POWER_TOKEN_CAP, POWER_TOKEN_CHOICES } from './data';
-import { todayKey, weekKey, monthKey, dateSeededMonster, getLevelFromXP, critChanceForLevel, luckForLevel, streakMultiplier, dailyBonusChoreId, rollLoot, checkNewBadges, getPlayerTitle, getTitleForBadge, isPowerUpActive, getActivePowerUps, cleanExpiredPowerUps, checkPowerUpTriggers, choreDoneKey, isChoreDoneForPlayer, initDungeonMap, dungeonMoveResult, generateFloor } from './logic';
+import { todayKey, weekKey, monthKey, keyIsBefore, isStateStale, dateSeededMonster, getLevelFromXP, critChanceForLevel, luckForLevel, streakMultiplier, dailyBonusChoreId, rollLoot, checkNewBadges, getPlayerTitle, getTitleForBadge, isPowerUpActive, getActivePowerUps, cleanExpiredPowerUps, checkPowerUpTriggers, choreDoneKey, isChoreDoneForPlayer, initDungeonMap, dungeonMoveResult, generateFloor } from './logic';
 import PlayerCard from './components/PlayerCard';
 import ChoreGrid from './components/ChoreGrid';
 import RewardGrid from './components/RewardGrid';
@@ -55,7 +55,7 @@ function applyAutoResets(raw, players, weekStartDay = 1) {
   let changed = false;
   const penaltyMsgs = [];
 
-  if (state.todayKey !== todayKey()) {
+  if (keyIsBefore(state.todayKey, todayKey())) {
     const yKey = state.todayKey;
     const zeros = Object.fromEntries(players.map(p => [p.id, 0]));
     const newStreaks = { ...zeros, ...(state.streaks || {}) };
@@ -140,14 +140,14 @@ function applyAutoResets(raw, players, weekStartDay = 1) {
     changed = true;
   }
 
-  if (state.weekKey !== weekKey(weekStartDay)) {
+  if (keyIsBefore(state.weekKey, weekKey(weekStartDay))) {
     state.weeklyDone = {};
     state.weekKey = weekKey(weekStartDay);
     state.weeklyGold = Object.fromEntries(players.map(p => [p.id, 0]));
     changed = true;
   }
 
-  if (state.monthKey !== monthKey()) {
+  if (keyIsBefore(state.monthKey, monthKey())) {
     state.monthlyDone = {};
     state.monthKey = monthKey();
     changed = true;
@@ -274,30 +274,50 @@ export default function App() {
     init();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const loadState = useCallback(async () => {
-    if (Date.now() - lastActionAt.current < 3000) return;
+  const weekStartDay = config?.weekStartDay ?? 1;
+
+  const loadState = useCallback(async ({ force = false } = {}) => {
+    if (!force && Date.now() - lastActionAt.current < 3000) return;
     try {
       const res = await fetch(`${API}/state`);
       const fetched = await res.json();
-      const { state: after, changed } = applyAutoResets(fetched, players, config?.weekStartDay ?? 1);
+      const { state: after, changed } = applyAutoResets(fetched, players, weekStartDay);
       if (changed) await saveState(after);
       setServerState(after);
     } catch (e) {
       console.error('Poll failed', e);
     }
-  }, [players, saveState]);
+  }, [players, saveState, weekStartDay]);
 
   useEffect(() => {
     if (!config) return;
     const id = setInterval(loadState, 5000);
-    return () => clearInterval(id);
+    // Background tabs (tablets/phones) get their timers suspended; refresh
+    // immediately when the board becomes visible again instead of showing
+    // yesterday's chores until the next poll.
+    const onVisible = () => { if (document.visibilityState === 'visible') loadState({ force: true }); };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+    };
   }, [loadState, config]);
 
   const updateState = useCallback(async (newState) => {
+    // Never write a state that was computed from a pre-reset snapshot: that
+    // would overwrite the midnight reset with yesterday's dailyDone etc.
+    if (isStateStale(newState, weekStartDay)) {
+      lastActionAt.current = 0;
+      await loadState({ force: true });
+      showToast('Neuer Tag – Quests wurden zurückgesetzt. Bitte nochmal tippen.');
+      return;
+    }
     lastActionAt.current = Date.now();
     setServerState(newState);
     await saveState(newState);
-  }, [saveState]);
+  }, [saveState, loadState, weekStartDay, showToast]);
 
   const selectPlayer = useCallback((id) => {
     setSelected(prev => prev === id ? null : id);
@@ -316,6 +336,7 @@ export default function App() {
 
   const claimChore = useCallback(async (choreId) => {
     if (!selected || !active || !serverState) return;
+    if (isStateStale(serverState, weekStartDay)) { await loadState({ force: true }); return; }
     const chore = activeChores.find(c => c.id === choreId);
 
     // Optional confirmation to prevent accidental taps
@@ -521,7 +542,7 @@ export default function App() {
       ? `${player.name} bezwang ${m.name}!${critTag} +${totalGoldGain + CHORE_GOLD}g${streakTag}${luckyTag}${lootTag}${levelTag}${badgeTag}${dungeonTag}`
       : `${player.name} trifft für ${actualPts}! +${CHORE_GOLD}g${critTag}${comboTag}${bonusTag} HP:${hp}/${m.maxHP}${lootTag}${dungeonTag}`;
     showToast(msg);
-  }, [selected, active, serverState, players, activeChores, bonusChoreId, updateState, showToast]);
+  }, [selected, active, serverState, players, activeChores, bonusChoreId, updateState, showToast, weekStartDay, loadState]);
 
   const unclaimChore = useCallback(async (choreId) => {
     if (!selected || !active || !serverState) return;
@@ -992,6 +1013,7 @@ export default function App() {
             dailyDone={state.dailyDone}
             weeklyDone={state.weeklyDone}
             monthlyDone={state.monthlyDone || {}}
+            weekStartDay={config?.weekStartDay ?? 1}
             onClaimChore={claimChore}
             onUnclaimChore={unclaimChore}
             bonusChoreId={bonusChoreId}

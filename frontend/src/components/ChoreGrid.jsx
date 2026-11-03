@@ -49,7 +49,7 @@ function ChoreCard({ chore, players, dailyDone, weeklyDone, monthlyDone, selecte
   );
 }
 
-export default function ChoreGrid({ player, players, activeChores, dailyDone, weeklyDone, monthlyDone, onClaimChore, onUnclaimChore, bonusChoreId, readOnly }) {
+export default function ChoreGrid({ player, players, activeChores, dailyDone, weeklyDone, monthlyDone, weekStartDay = 1, onClaimChore, onUnclaimChore, bonusChoreId, readOnly }) {
   const chores = getChoresFor(player, activeChores);
   const byName  = (a, b) => a.name.localeCompare(b.name);
   const daily   = chores.filter(c => c.freq === 'daily').sort(byName);
@@ -88,7 +88,7 @@ export default function ChoreGrid({ player, players, activeChores, dailyDone, we
           <div className="section-label">
             <TileSprite tile={131} display={12} />
             Wöchentliche Quests
-            <span className="reset-info">— Reset am Sonntag</span>
+            <span className="reset-info">— Reset am {weekStartDay === 0 ? 'Sonntag' : 'Montag'}</span>
           </div>
           <div className="chores">
             {weekly.map(c => <ChoreCard key={c.id} chore={c} {...cardProps} />)}

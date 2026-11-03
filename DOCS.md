@@ -33,7 +33,7 @@ You can return to Settings any time to add/remove players, change chores, adjust
 Every day at midnight:
 - Each player gets a new monster (seeded by date, so everyone sees the same monsters)
 - All daily chores reset
-- Weekly chores reset on Sundays, monthly chores on the 1st
+- Weekly chores reset at the start of the week (Monday by default, configurable to Sunday), monthly chores on the 1st
 
 ### What Happens If You Don't Defeat Your Monster
 
@@ -245,7 +245,7 @@ XP, levels, gold, badges, and history persist forever.
 
 ## Weekly Leaderboard
 
-The History tab shows a weekly gold leaderboard  -  who earned the most gold this week. Resets when the week rolls over (Sunday).
+The History tab shows a weekly gold leaderboard  -  who earned the most gold this week. Resets when the week rolls over (Monday by default, or Sunday if configured).
 
 ---
 
